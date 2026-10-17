@@ -1,0 +1,163 @@
+[
+  {
+    "id": "up-mundos",
+    "type": "world",
+    "title": "Os 6 Mundos Oficiais do Festival Iguassu Inova 2026",
+    "world": "Todos os Mundos",
+    "summary": "1) Itaipu Parquetec (Inovação aberta, IA, transição energética); 2) FICiências (4.300+ inscritos, 500 projetos de jovens pesquisadores); 3) Sapiens (16+ universidades, games, cultura digital); 4) Summit Tour (Turismo regenerativo e hospitalidade); 5) FIMS (Música, indústria da cultura e grandes shows); 6) RME (Rede Mulher Empreendedora e liderança feminina)."
+  },
+  {
+    "id": "up-show-1",
+    "type": "show",
+    "title": "Os Garotin (Show Nacional Confirmado)",
+    "world": "FIMS",
+    "summary": "Trio de São Gonçalo (RJ) formado por Anchietx, Cupertino e Leo Guima. Revelação da nova MPB misturando soul, funk, samba e R&B. Indicados ao Grammy Latino 2024. Show gratuito no palco principal."
+  },
+  {
+    "id": "up-show-2",
+    "type": "show",
+    "title": "Duda Beat (Show Nacional Confirmado)",
+    "world": "FIMS",
+    "summary": "Consagrada cantora pernambucana conhecida como a 'rainha da sofrência pop', misturando ritmos nordestinos com pop eletrônico e sintetizadores dançantes. Show gratuito no palco principal."
+  },
+  {
+    "id": "up-show-3",
+    "type": "show",
+    "title": "Arnaldo Antunes (Show Nacional Confirmado)",
+    "world": "FIMS",
+    "summary": "Lenda da música brasileira, ex-integrante dos Titãs e do trio Tribalistas. Poeta visual e compositor de clássicos do rock e MPB, vencedor de múltiplos prêmios Grammy Latino. Show gratuito no palco principal."
+  },
+  {
+    "id": "up-show-4",
+    "type": "show",
+    "title": "Emicida (Show Nacional Confirmado)",
+    "world": "FIMS",
+    "summary": "Um dos maiores expoentes da cultura e música contemporânea brasileira. Rapper, escritor, pensador social e empresário musical à frente do Laboratório Fantasma. Show gratuito fechando o festival com mensagem de cidadania e afeto."
+  },
+  {
+    "id": "up-spk-1",
+    "type": "speaker",
+    "title": "Dr. Drauzio Varella",
+    "world": "Sapiens / Parquetec",
+    "summary": "Médico oncologista, cientista, escritor consagrado e o mais respeitado comunicador de saúde pública do país. Palestra sobre longevidade, saúde mental e equilíbrio."
+  },
+  {
+    "id": "up-spk-2",
+    "type": "speaker",
+    "title": "Caito Maia",
+    "world": "Itaipu Parquetec",
+    "summary": "Fundador e CEO da Chilli Beans, a maior rede de óculos escuros e acessórios da América Latina, e investidor do Shark Tank Brasil. Palestra sobre branding, vendas e inovação empresarial."
+  },
+  {
+    "id": "up-spk-3",
+    "type": "speaker",
+    "title": "Monja Coen Roshi",
+    "world": "Corpo & Mente",
+    "summary": "Missionária oficial da tradição Soto Shu do Japão, fundadora da Comunidade Zen Budista do Brasil e autora best-seller. Palestra sobre saúde emocional, meditação e liderança ética."
+  },
+  {
+    "id": "up-spk-4",
+    "type": "speaker",
+    "title": "Gabriela Prioli",
+    "world": "Sapiens",
+    "summary": "Mestre em direito penal pela USP, professora universitária, escritora e apresentadora de TV/podcasts. Debate sobre comunicação crítica, sociedade e debate público."
+  },
+  {
+    "id": "up-spk-5",
+    "type": "speaker",
+    "title": "Edmílson",
+    "world": "Impacto Social",
+    "summary": "Pentacampeão mundial pela Seleção Brasileira (2002) com passagens por Barcelona e Lyon. Presidente da Fundação Edmílson, abordando disciplina, desenvolvimento social e esporte."
+  },
+  {
+    "id": "up-spk-6",
+    "type": "speaker",
+    "title": "Wendel Bezerra",
+    "world": "Sapiens (Geeks & Games)",
+    "summary": "Diretor de dublagem e dublador mais reconhecido do Brasil (voz do Goku em Dragon Ball Z, Bob Esponja e Edward Cullen). Painel sobre criatividade, voz e carreira na dublagem."
+  },
+  {
+    "id": "up-spk-7",
+    "type": "speaker",
+    "title": "Paulo Nobre",
+    "world": "Itaipu Parquetec",
+    "summary": "Advogado, investidor financeiro, piloto de rali e ex-presidente da Sociedade Esportiva Palmeiras responsável pela reestruturação financeira e modernização do clube. Gestão profissional e governança."
+  },
+  {
+    "id": "up-spk-8",
+    "type": "speaker",
+    "title": "Ana Fontes",
+    "world": "RME (Mulher Empreendedora)",
+    "summary": "Empreendedora social, fundadora da Rede Mulher Empreendedora (RME), delegada líder do W20/G20 e eleita uma das mulheres mais poderosas do Brasil pela Forbes. Liderança e autonomia financeira feminina."
+  },
+  {
+    "id": "up-spk-9",
+    "type": "speaker",
+    "title": "Regina Tchelly",
+    "world": "Sustentabilidade",
+    "summary": "Empreendedora gastronômica e fundadora da iniciativa Favela Orgânica, referência internacional no combate ao desperdício de alimentos e gastronomia sustentável acessível."
+  },
+  {
+    "id": "up-spk-10",
+    "type": "speaker",
+    "title": "Gustavo Arns",
+    "world": "Corpo & Mente",
+    "summary": "Criador do Congresso Internacional de Felicidade e do Centro de Estudos da Felicidade. Palestra sobre bem-estar subjetivo, psicologia positiva e ambientes de trabalho saudáveis."
+  },
+  {
+    "id": "up-spk-11",
+    "type": "speaker",
+    "title": "Ikaro Kadoshi",
+    "world": "Sapiens / Arte & Cultura",
+    "summary": "Artista, drag queen, jornalista e apresentadora de TV pioneira em debates sobre diversidade, representatividade e direitos LGBTQIA+ em grandes veículos de comunicação."
+  },
+  {
+    "id": "up-spk-12",
+    "type": "speaker",
+    "title": "André Carvalhal",
+    "world": "Summit Tour / Sustentabilidade",
+    "summary": "Consultor e autor especialista em moda sustentável, consumo consciente, branding ético e novos modelos de negócios de impacto positivo."
+  },
+  {
+    "id": "up-spk-13",
+    "type": "speaker",
+    "title": "Samuka",
+    "world": "Arte & Cultura",
+    "summary": "Dançarino profissional de Breaking, atleta da Seleção Brasileira e exemplo internacional de superação e inclusão no esporte olímpico."
+  },
+  {
+    "id": "up-spk-14",
+    "type": "speaker",
+    "title": "Rapha do RH",
+    "world": "Sapiens",
+    "summary": "Criador de conteúdo, executivo de recursos humanos e palestrante sobre inteligência artificial no trabalho, empregabilidade jovem e futuro das carreiras."
+  },
+  {
+    "id": "up-spk-15",
+    "type": "speaker",
+    "title": "Adonias Freestyle",
+    "world": "Sapiens / Lazer",
+    "summary": "Atleta da Seleção Brasileira de Futebol Freestyle, influenciador esportivo com milhões de seguidores. Demonstrações ao vivo e conversa sobre criatividade no esporte digital."
+  },
+  {
+    "id": "up-rel-1",
+    "type": "release",
+    "title": "FICiências bate recorde histórico com 4.300 inscrições e 500 projetos expostos",
+    "world": "FICiências",
+    "summary": "A 15ª edição da Feira de Inovação das Ciências e Engenharias atinge marca recorde reunindo projetos científicos práticos desenvolvidos por estudantes e professores de escolas públicas e privadas do Brasil, Paraguai e Argentina."
+  },
+  {
+    "id": "up-prog-1",
+    "type": "release",
+    "title": "Circuito Esquenta Festival leva ativações aos bairros e universidades antes de novembro",
+    "world": "Itaipu Parquetec",
+    "summary": "Ação prévia que conecta instituições de ensino superior (UNILA, UNIOESTE, UDC, IFPR) e espaços comunitários de Foz do Iguaçu com música, ciência e cadastro de caravanas."
+  },
+  {
+    "id": "up-prog-2",
+    "type": "release",
+    "title": "Programa 'O Festival é Seu': chamada aberta para palcos, oficinas e startups",
+    "world": "Todos os Mundos",
+    "summary": "Comunidade, estudantes, pesquisadores e startups podem submeter propostas gratuitas para ganhar espaço equipado de apresentação durante os 4 dias do evento no Itaipu Parquetec."
+  }
+]

@@ -32,6 +32,10 @@ export default function Home() {
     setUpdates((prev) => [newUpdate, ...prev]);
   };
 
+  const handleDeleteUpdate = (id: string) => {
+    setUpdates((prev) => prev.filter((u) => u.id !== id));
+  };
+
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-amber-500/30">
       <Toaster position="top-right" richColors />
@@ -148,7 +152,11 @@ export default function Home() {
 
           {/* TELA 4: HUB DO FESTIVAL */}
           <TabsContent value="hub" className="outline-none focus:ring-0">
-            <HubScreen updates={updates} onAddUpdate={handleAddUpdate} />
+            <HubScreen
+              updates={updates}
+              onAddUpdate={handleAddUpdate}
+              onDeleteUpdate={handleDeleteUpdate}
+            />
           </TabsContent>
         </Tabs>
       </main>
