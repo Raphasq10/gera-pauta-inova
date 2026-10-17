@@ -140,7 +140,10 @@ export default function Home() {
 
           {/* TELA 3: PERSONAS & DADOS DOS INSCRITOS */}
           <TabsContent value="personas" className="outline-none focus:ring-0">
-            <PersonasScreen personas={personas} />
+            <PersonasScreen
+              personas={personas}
+              onPersonasUpdated={(updatedPersonas) => setPersonas(updatedPersonas)}
+            />
           </TabsContent>
 
           {/* TELA 4: HUB DO FESTIVAL */}
