@@ -284,7 +284,7 @@ ${pitch.legenda}
                     <SelectItem key={u.id} value={u.id} className="py-2.5 px-3 text-sm cursor-pointer hover:bg-slate-800">
                       <div className="flex flex-col text-left">
                         <span className="font-semibold text-white">[{u.world}] {u.title}</span>
-                        <span className="text-xs text-slate-400 capitalize">{u.type} • {u.summary.slice(0, 60)}...</span>
+                        <span className="text-xs text-slate-400 capitalize">{u.type} • {(u.summary || "").slice(0, 60)}...</span>
                       </div>
                     </SelectItem>
                   ))}
