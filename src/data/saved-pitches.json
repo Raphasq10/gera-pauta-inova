@@ -43,55 +43,25 @@
   },
   {
     "id": "pitch-1792413870671-1",
-    "version": 1,
+    "version": 2,
     "createdAt": "19/10/2026, 09:44",
     "personaId": "p2",
     "personaName": "Lucas & Sofia (Universitários Alunos)",
     "initialIdea": "Venha curtir com os seus amigos - algo falando que o universitario pode vir com os amigos, e tudo que temos no festival iguassu inova",
     "channel": "instagram",
-    "mote": "[Grade Oficial do Festival] Conexão da ideia do conteudista (\"Venha curtir com os seus amigos - algo faland...\") com a prioridade de Lucas & Sofia (Universitários Alunos) em Arte & Cultura.",
-    "headlineArte": "\"Venha curtir com os seus amigos - algo falando que o...\" — o Festival Iguassu Inova te espera.",
+    "mote": "[Grade Oficial do Festival] Conexão da ideia do conteudista (\"Venha curtir com os seus amigos - algo faland...\") com a prioridade de Lucas & Sofia (Universitários Alunos) em Arte & Cultura. (Lapidado: achei meio estranho esse headline principalmente essa parte \"...lgo falando que o...\"\n\ntipo qual o sentido disso, sendo que quero um click bat para o universitario ver o post?)",
+    "headlineArte": "[v2] \"Venha curtir com os seus amigos - algo falando que o...\" — o Festival Iguassu Inova te espera.",
     "legenda": "Você já pensou sobre isso? 🤔✨\n\nNo Festival Iguassu Inova 2026, conectamos ideias que transformam o ecossistema com quem está na linha de frente.\n\nSe o seu foco é explorar tendências / futuro, o Parque Tecnológico Itaipu preparou 4 dias de imersão total com palestras, workshops e conexões com Itaipu Parquetec.\n\n📅 25 a 28 de Novembro de 2026\n📍 Itaipu Parquetec - Foz do Iguaçu (PR)\n🎟️ 100% GRATUITO (Passaportes limitados)\n\nGaranta seu ingresso agora mesmo no app Yazo Tickets pelo link da bio!\n\n#FestivalIguassuInova2026 #ItaipuParquetec #Inovacao #alunos",
-    "formato": "Memes de Rotina",
-    "justificativaFormato": "Recomendamos Memes de Rotina porque 59.6% dos 2268 adultos deste público priorizam Arte & Cultura e 43.7% utilizam Transporte Público (Ônibus). O gancho guiado pela ideia ressoa com a dor de Horas complementares, conexão com mercado real e logística de transporte público até o Parquetec.."
-  },
-  {
-    "id": "pitch-1",
-    "version": 1,
-    "createdAt": "16/10/2026 14:20",
-    "personaId": "p2",
-    "personaName": "Lucas Rocha (Universitário Alunos)",
-    "updateTitle": "Rapha do RH + Mundo Sapiens",
-    "initialIdea": "Post bem-humorado de sobrevivência ao final de semestre na UNILA",
-    "channel": "instagram",
-    "mote": "Transforme o cansaço do final de semestre em horas complementares e networking de carreira real.",
-    "headlineArte": "Sobreviveu à entrega de TCC? O seu diploma precisa ver isso.",
-    "legenda": "Quem nunca perdeu o sono calculando as horas complementares que atire a primeira pedra! 🎓 No Mundo Sapiens do Festival Iguassu Inova 2026, além de garantir o certificado oficial do Itaipu Parquetec, você vai trocar ideia ao vivo com referências como Rapha do RH sobre o futuro das profissões e IA no mercado.\n\nE o melhor: o festival é 100% gratuito e tem linhas de transporte público direto para o portão do evento.\n\nGaranta seu ingresso digital gratuito no link da bio pela Yazo Tickets!\n\n#FestivalIguassuInova #MundoSapiens #UniversitariosFoz #ItaipuParquetec",
-    "formato": "Carrossel de 4 Telas (Meme inicial + Dicas Práticas)",
-    "justificativaFormato": "Escolhemos Carrossel porque 76.9% dos 2.268 alunos inscritos buscam explorar tendências de carreira e 43.7% dependem de transporte público, permitindo reter atenção com humor e entregar utilidade logística."
-  },
-  {
-    "id": "pitch-2",
-    "version": 2,
-    "createdAt": "16/10/2026 15:45",
-    "personaId": "p3",
-    "personaName": "Juliana Mendes (Comunidade Foz)",
-    "updateTitle": "Duda Beat (Show Nacional Confirmado)",
-    "initialIdea": "Lembrar os moradores de Foz que o show é gratuito e tem espaço família",
-    "channel": "instagram",
-    "mote": "A melhor programação cultural gratuita do ano no quintal da comunidade de Foz.",
-    "headlineArte": "Duda Beat de graça em Foz do Iguaçu? Pode acreditar.",
-    "legenda": "Você não leu errado: um dos maiores shows do Brasil vai rolar aqui em Foz com entrada franca! 🎶 O Festival Iguassu Inova reuniu música, feira gastronômica e muita diversão para você curtir com a família ou com os amigos.\n\nNão precisa pagar nada, só emitir o passaporte gratuito pelo celular na Yazo Tickets e apresentar na entrada do Itaipu Parquetec.\n\nMarca aqui quem vai com você curtir essa noite inesquecível! 👇\n\n#FestivalIguassuInova #FIMS #DudaBeatEmFoz #CulturaFoz",
-    "formato": "Reels Curto com trecho musical e chamada em texto",
-    "justificativaFormato": "Reels atinge diretamente o topo do funil do Instagram, onde 68.1% dos moradores de Foz souberam do festival e 71.1% declararam ter atividades culturais e shows como objetivo central.",
+    "formato": "reels",
+    "justificativaFormato": "Recomendamos Memes de Rotina porque 59.6% dos 2268 adultos deste público priorizam Arte & Cultura e 43.7% utilizam Transporte Público (Ônibus). O gancho guiado pela ideia ressoa com a dor de Horas complementares, conexão com mercado real e logística de transporte público até o Parquetec.. [Ajustado para formato reels com foco em padrão].",
     "previousVersions": [
       {
         "version": 1,
-        "mote": "Show nacional de música brasileira acessível a todos os moradores.",
-        "headlineArte": "Venha ver o grande show da Duda Beat no Parquetec.",
-        "legenda": "O Festival traz grandes atrações. Emitam seus ingressos na Yazo.",
-        "formato": "Card Estático Simples",
-        "changeNote": "O conteudista solicitou formato Reels mais chamativo destacando 'de graça' na primeira tela."
+        "mote": "[Grade Oficial do Festival] Conexão da ideia do conteudista (\"Venha curtir com os seus amigos - algo faland...\") com a prioridade de Lucas & Sofia (Universitários Alunos) em Arte & Cultura.",
+        "headlineArte": "\"Venha curtir com os seus amigos - algo falando que o...\" — o Festival Iguassu Inova te espera.",
+        "legenda": "Você já pensou sobre isso? 🤔✨\n\nNo Festival Iguassu Inova 2026, conectamos ideias que transformam o ecossistema com quem está na linha de frente.\n\nSe o seu foco é explorar tendências / futuro, o Parque Tecnológico Itaipu preparou 4 dias de imersão total com palestras, workshops e conexões com Itaipu Parquetec.\n\n📅 25 a 28 de Novembro de 2026\n📍 Itaipu Parquetec - Foz do Iguaçu (PR)\n🎟️ 100% GRATUITO (Passaportes limitados)\n\nGaranta seu ingresso agora mesmo no app Yazo Tickets pelo link da bio!\n\n#FestivalIguassuInova2026 #ItaipuParquetec #Inovacao #alunos",
+        "formato": "Memes de Rotina",
+        "changeNote": "achei meio estranho esse headline principalmente essa parte \"...lgo falando que o...\"\n\ntipo qual o sentido disso, sendo que quero um click bat para o universitario ver o post?"
       }
     ]
   }
