@@ -20,18 +20,8 @@ O **InovaPauta AI** é uma aplicação web de inteligência editorial desenvolvi
 ---
 
 ## 💻 Stack Técnica
-
-- **Framework Full-Stack:** Next.js (App Router) + React 19 + TypeScript
-- **Estilização & UI:** Tailwind CSS + shadcn/ui + Lucide Icons
-- **Inteligência Artificial:** Google Gemini SDK (`@google/genai` — modelo `gemini-2.5-flash` com Structured Outputs)
-- **Processamento de Dados:** SheetJS (`xlsx`) com filtro automático de menores de idade e conformidade LGPD
-- **Formulários & Validação:** React Hook Form + Zod
-- **Banco de Dados:** Persistência Local em Disco (`src/data/*.json`) compatível com ambiente XAMPP
-
----
-
-## 📄 Documentação do Projeto
-
-- 📋 **[PRD do MVP (PRD.md)](./PRD.md)** — Visão do produto, personas de usuário, user stories priorizadas (MoSCoW), features Must Have, fluxos e regras de negócio.
-- 📊 **[PRD Base & Análise de Dados 2026 (PRD_GERADOR_DE_PAUTAS.md)](./PRD_GERADOR_DE_PAUTAS.md)** — Diagnóstico estatístico completo da planilha de inscritos 2026 e detalhamento das 4 Personas de Público.
-- 🏗️ **[Arquitetura & Stack Técnica (TECH_STACK.md)](./TECH_STACK.md)** — Justificativa das escolhas técnicas, funcionamento do banco de dados local/XAMPP e guia de integração com o Google Gemini.
+ 
+ - **Framework Full-Stack:** Next.js (App Router) + React 19 + TypeScript
+ - **Estilização & UI:** Tailwind CSS + shadcn/ui + Lucide Icons
+ - **Inteligência Artificial:** Google Gemini AI (REST API + SDK)
+ - **Formulários & Validação:** React Hook Form + Zod

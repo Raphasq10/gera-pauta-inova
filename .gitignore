@@ -16,6 +16,12 @@ dados publico inscrito 2026/
 *.xls
 *.csv
 
+# Documentação interna, especificações e testes locais
+docs/
+AGENTS.md
+PRD*.md
+TECH_STACK.md
+
 # Permitir o arquivo de exemplo sem valores secretos
 !.env.example
 
