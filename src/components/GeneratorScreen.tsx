@@ -239,42 +239,53 @@ ${pitch.legenda}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             {/* 1. Seletor de Persona */}
             <div>
-              <label htmlFor="select-persona" className="block text-xs font-bold text-slate-100 mb-1.5 flex items-center gap-1.5">
-                <Users className="w-3.5 h-3.5 text-blue-400" />
+              <label htmlFor="select-persona" className="block text-sm font-bold text-slate-100 mb-2 flex items-center gap-1.5">
+                <Users className="w-4 h-4 text-blue-400" />
                 1. Persona-Alvo *
               </label>
               <Select value={selectedPersonaId} onValueChange={(val) => val && setSelectedPersonaId(val)}>
-                <SelectTrigger id="select-persona" className="bg-slate-950 border-slate-600 text-white font-medium text-xs focus:border-amber-400 focus:ring-1 focus:ring-amber-400">
+                <SelectTrigger id="select-persona" className="w-full h-11 bg-slate-950 border-slate-600 text-white font-medium text-sm focus:border-amber-400 focus:ring-1 focus:ring-amber-400">
                   <SelectValue placeholder="Selecione a Persona" />
                 </SelectTrigger>
-                <SelectContent className="bg-slate-900 border-slate-700 text-slate-100 text-xs">
+                <SelectContent className="bg-slate-900 border-slate-700 text-slate-100 text-sm min-w-[340px] max-h-80 shadow-2xl p-1.5">
                   {personas.map((p) => (
-                    <SelectItem key={p.id} value={p.id}>
-                      {p.name} ({p.count} inscritos)
+                    <SelectItem key={p.id} value={p.id} className="py-2.5 px-3 text-sm cursor-pointer hover:bg-slate-800">
+                      <div className="flex flex-col text-left">
+                        <span className="font-semibold text-white">{p.name}</span>
+                        <span className="text-xs text-slate-400">{p.count} inscritos ({p.pctOfAdults}% dos adultos) • {p.role}</span>
+                      </div>
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
               {fieldErrors.personaId && (
-                <span className="text-[11px] text-rose-400 mt-1 block font-medium">{fieldErrors.personaId}</span>
+                <span className="text-xs text-rose-400 mt-1.5 block font-medium">{fieldErrors.personaId}</span>
               )}
             </div>
 
             {/* 2. Seletor de Atualização / Foco do Festival */}
             <div>
-              <label htmlFor="select-update" className="block text-xs font-bold text-slate-100 mb-1.5 flex items-center gap-1.5">
-                <Layers className="w-3.5 h-3.5 text-amber-400" />
+              <label htmlFor="select-update" className="block text-sm font-bold text-slate-100 mb-2 flex items-center gap-1.5">
+                <Layers className="w-4 h-4 text-amber-400" />
                 2. Foco / Novidade do Evento
               </label>
               <Select value={selectedUpdateId} onValueChange={(val) => val && setSelectedUpdateId(val)}>
-                <SelectTrigger id="select-update" className="bg-slate-950 border-slate-600 text-white font-medium text-xs focus:border-amber-400 focus:ring-1 focus:ring-amber-400">
+                <SelectTrigger id="select-update" className="w-full h-11 bg-slate-950 border-slate-600 text-white font-medium text-sm focus:border-amber-400 focus:ring-1 focus:ring-amber-400">
                   <SelectValue placeholder="Geral do Festival" />
                 </SelectTrigger>
-                <SelectContent className="bg-slate-900 border-slate-700 text-slate-100 text-xs">
-                  <SelectItem value="none">Geral do Festival (Sem atração específica)</SelectItem>
+                <SelectContent className="bg-slate-900 border-slate-700 text-slate-100 text-sm min-w-[360px] max-h-80 shadow-2xl p-1.5">
+                  <SelectItem value="none" className="py-2.5 px-3 text-sm cursor-pointer hover:bg-slate-800">
+                    <div className="flex flex-col text-left">
+                      <span className="font-semibold text-amber-400">🌐 Geral do Festival</span>
+                      <span className="text-xs text-slate-400">Sem atração específica (institucional / visão geral)</span>
+                    </div>
+                  </SelectItem>
                   {updates.map((u) => (
-                    <SelectItem key={u.id} value={u.id}>
-                      [{u.world}] {u.title}
+                    <SelectItem key={u.id} value={u.id} className="py-2.5 px-3 text-sm cursor-pointer hover:bg-slate-800">
+                      <div className="flex flex-col text-left">
+                        <span className="font-semibold text-white">[{u.world}] {u.title}</span>
+                        <span className="text-xs text-slate-400 capitalize">{u.type} • {u.summary.slice(0, 60)}...</span>
+                      </div>
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -283,49 +294,66 @@ ${pitch.legenda}
 
             {/* 3. Canal de Destino */}
             <div>
-              <label className="block text-xs font-bold text-slate-100 mb-1.5">3. Canal de Destino</label>
+              <label className="block text-sm font-bold text-slate-100 mb-2 flex items-center gap-1.5">
+                3. Canal de Destino
+              </label>
               <Select value={channel} onValueChange={(val: any) => val && setChannel(val)}>
-                <SelectTrigger className="bg-slate-950 border-slate-600 text-white font-medium text-xs focus:border-amber-400 focus:ring-1 focus:ring-amber-400">
+                <SelectTrigger className="w-full h-11 bg-slate-950 border-slate-600 text-white font-medium text-sm focus:border-amber-400 focus:ring-1 focus:ring-amber-400">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="bg-slate-900 border-slate-700 text-slate-100 text-xs">
-                  <SelectItem value="instagram">Instagram (@festivaliguassuinova)</SelectItem>
-                  <SelectItem value="linkedin">LinkedIn (Itaipu Parquetec B2B)</SelectItem>
-                  <SelectItem value="whatsapp">WhatsApp / E-mail</SelectItem>
+                <SelectContent className="bg-slate-900 border-slate-700 text-slate-100 text-sm min-w-[320px] shadow-2xl p-1.5">
+                  <SelectItem value="instagram" className="py-2.5 px-3 text-sm cursor-pointer hover:bg-slate-800">
+                    <div className="flex flex-col text-left">
+                      <span className="font-semibold text-white">📸 Instagram</span>
+                      <span className="text-xs text-slate-400">Feed & Reels (@festivaliguassuinova)</span>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="linkedin" className="py-2.5 px-3 text-sm cursor-pointer hover:bg-slate-800">
+                    <div className="flex flex-col text-left">
+                      <span className="font-semibold text-white">💼 LinkedIn</span>
+                      <span className="text-xs text-slate-400">Tom profissional / B2B (Itaipu Parquetec)</span>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="whatsapp" className="py-2.5 px-3 text-sm cursor-pointer hover:bg-slate-800">
+                    <div className="flex flex-col text-left">
+                      <span className="font-semibold text-white">💬 WhatsApp / E-mail</span>
+                      <span className="text-xs text-slate-400">Comunicação direta e avisos aos inscritos</span>
+                    </div>
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             {/* 4. Grade Semanal & Qtd */}
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-bold text-slate-100 mb-1.5">Linha Editorial</label>
+                <label className="block text-sm font-bold text-slate-100 mb-2">Linha Editorial</label>
                 <Select value={weeklyTheme} onValueChange={(val: any) => val && setWeeklyTheme(val)}>
-                  <SelectTrigger className="bg-slate-950 border-slate-600 text-white font-medium text-xs focus:border-amber-400 focus:ring-1 focus:ring-amber-400">
+                  <SelectTrigger className="w-full h-11 bg-slate-950 border-slate-600 text-white font-medium text-sm focus:border-amber-400 focus:ring-1 focus:ring-amber-400">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-slate-900 border-slate-700 text-slate-100 text-xs">
-                    <SelectItem value="livre">Tema Livre</SelectItem>
-                    <SelectItem value="terca-futuro">Terça IA/Futuro</SelectItem>
-                    <SelectItem value="quarta-ciencia">Quarta Ciência</SelectItem>
-                    <SelectItem value="quinta-b2b">Quinta Negócios</SelectItem>
-                    <SelectItem value="sexta-lazer">Sexta Shows</SelectItem>
+                  <SelectContent className="bg-slate-900 border-slate-700 text-slate-100 text-sm min-w-[220px] shadow-2xl p-1.5">
+                    <SelectItem value="livre" className="py-2 px-3 text-sm cursor-pointer hover:bg-slate-800">Tema Livre</SelectItem>
+                    <SelectItem value="terca-futuro" className="py-2 px-3 text-sm cursor-pointer hover:bg-slate-800">Terça IA/Futuro</SelectItem>
+                    <SelectItem value="quarta-ciencia" className="py-2 px-3 text-sm cursor-pointer hover:bg-slate-800">Quarta Ciência</SelectItem>
+                    <SelectItem value="quinta-b2b" className="py-2 px-3 text-sm cursor-pointer hover:bg-slate-800">Quinta Negócios</SelectItem>
+                    <SelectItem value="sexta-lazer" className="py-2 px-3 text-sm cursor-pointer hover:bg-slate-800">Sexta Shows</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-100 mb-1.5">Qtd Pautas</label>
+                <label className="block text-sm font-bold text-slate-100 mb-2">Qtd Pautas</label>
                 <Select value={pitchCount.toString()} onValueChange={(v) => v && setPitchCount(parseInt(v))}>
-                  <SelectTrigger className="bg-slate-950 border-slate-600 text-white font-medium text-xs focus:border-amber-400 focus:ring-1 focus:ring-amber-400">
+                  <SelectTrigger className="w-full h-11 bg-slate-950 border-slate-600 text-white font-medium text-sm focus:border-amber-400 focus:ring-1 focus:ring-amber-400">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-slate-900 border-slate-700 text-slate-100 text-xs">
-                    <SelectItem value="1">1 Pauta</SelectItem>
-                    <SelectItem value="2">2 Pautas</SelectItem>
-                    <SelectItem value="3">3 Pautas</SelectItem>
-                    <SelectItem value="4">4 Pautas</SelectItem>
-                    <SelectItem value="5">5 Pautas</SelectItem>
+                  <SelectContent className="bg-slate-900 border-slate-700 text-slate-100 text-sm min-w-[160px] shadow-2xl p-1.5">
+                    <SelectItem value="1" className="py-2 px-3 text-sm cursor-pointer hover:bg-slate-800">1 Pauta</SelectItem>
+                    <SelectItem value="2" className="py-2 px-3 text-sm cursor-pointer hover:bg-slate-800">2 Pautas</SelectItem>
+                    <SelectItem value="3" className="py-2 px-3 text-sm cursor-pointer hover:bg-slate-800">3 Pautas</SelectItem>
+                    <SelectItem value="4" className="py-2 px-3 text-sm cursor-pointer hover:bg-slate-800">4 Pautas</SelectItem>
+                    <SelectItem value="5" className="py-2 px-3 text-sm cursor-pointer hover:bg-slate-800">5 Pautas</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -358,33 +386,36 @@ ${pitch.legenda}
             </div>
           </div>
 
-          {/* Campo em Destaque: Ideia Inicial / Briefing do Conteudista */}
+          {/* Campo em Destaque: Ideia de Conteúdo */}
           <div>
-            <div className="flex items-center justify-between mb-1.5">
-              <label htmlFor="initial-idea" className="text-xs font-bold text-white flex items-center gap-1.5">
+            <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+              <label htmlFor="initial-idea" className="text-sm font-bold text-white flex items-center gap-2">
                 <Lightbulb className="w-4 h-4 text-amber-400" />
-                💡 Ideia Inicial / Briefing do Conteudista (Opcional)
+                💡 Ideia de Conteúdo{" "}
+                <span className="text-amber-300 font-normal text-xs">
+                  (Escreva aqui a ideia de conteúdo ou o que precisamos comunicar)
+                </span>
               </label>
-              <span className="text-xs font-medium text-amber-300 bg-amber-400/10 px-2 py-0.5 rounded border border-amber-400/20">
+              <span className="text-xs font-medium text-amber-300 bg-amber-400/10 px-2.5 py-1 rounded-full border border-amber-400/30">
                 {initialIdea.trim() ? "✨ A IA vai transformar sua ideia em pautas completas" : "🤖 Deixe em branco para ideação 100% autônoma"}
               </span>
             </div>
             <Textarea
               id="initial-idea"
-              placeholder="Digite um insight, trend ou ângulo que você pensou. Ex: 'Fazer um meme sobre quem deixou pra emitir ingresso na última hora' ou 'Conectar a palestra da Monja Coen com saúde mental no trabalho'."
+              placeholder="Escreva aqui o que precisamos comunicar. Ex: 'Anunciar que o show do CPM 22 é 100% gratuito mas precisa retirar ingresso antecipado pelo site...', 'Explicar como funciona o credenciamento de estudantes', ou 'Destacar a palestra da Monja Coen sobre foco'. (Se deixar em branco, a IA propõe ângulos automáticos)."
               value={initialIdea}
               onChange={(e) => setInitialIdea(e.target.value)}
-              className="bg-slate-950 border-slate-600 text-white placeholder:text-slate-400 text-sm min-h-[90px] resize-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 font-normal leading-relaxed"
+              className="bg-slate-950 border-slate-600 text-white placeholder:text-slate-400 text-sm min-h-[96px] resize-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 font-normal leading-relaxed p-3.5"
               maxLength={800}
             />
             <div className="flex justify-between items-center text-xs text-slate-300 mt-1.5 font-medium">
-              <span>A IA vai cruzar esta ideia com as dores da persona selecionada.</span>
+              <span>A IA vai cruzar este briefing com os dados demográficos e dores da persona selecionada.</span>
               <span className={initialIdea.length > 750 ? "text-amber-400 font-bold" : "text-slate-300"}>
                 {initialIdea.length}/800 caracteres
               </span>
             </div>
             {fieldErrors.initialIdea && (
-              <span className="text-[11px] text-rose-400 mt-1 block font-medium">{fieldErrors.initialIdea}</span>
+              <span className="text-xs text-rose-400 mt-1.5 block font-medium">{fieldErrors.initialIdea}</span>
             )}
           </div>
         </CardContent>

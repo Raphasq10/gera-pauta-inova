@@ -144,34 +144,34 @@ export function RefinePitchModal({ pitch, isOpen, onClose, onApplyRefine, userAp
           {/* Troca Rápida de Parâmetros */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-bold text-slate-200 mb-1">Forçar outro Formato:</label>
+              <label className="block text-xs font-bold text-slate-200 mb-1.5">Forçar outro Formato:</label>
               <Select value={selectedFormat} onValueChange={(val) => val && setSelectedFormat(val)}>
-                <SelectTrigger className="bg-slate-950 border-slate-600 text-white text-xs w-full">
+                <SelectTrigger className="bg-slate-950 border-slate-600 text-white text-sm h-10 w-full">
                   <SelectValue placeholder="Manter o formato atual" />
                 </SelectTrigger>
-                <SelectContent className="bg-slate-900 border-slate-700 text-slate-100 text-xs">
-                  <SelectItem value="manter">Manter formato atual</SelectItem>
-                  <SelectItem value="reels">Reels Curto (Roteiro em 3 Cenas)</SelectItem>
-                  <SelectItem value="carrossel">Carrossel Educativo (4 a 6 Telas)</SelectItem>
-                  <SelectItem value="card">Card Único de Alto Impacto</SelectItem>
-                  <SelectItem value="stories">Sequência de 3 Stories Interativos</SelectItem>
-                  <SelectItem value="linkedin">Artigo / Post Executivo (LinkedIn)</SelectItem>
+                <SelectContent className="bg-slate-900 border-slate-700 text-slate-100 text-sm min-w-[280px] p-1.5">
+                  <SelectItem value="manter" className="py-2 px-2.5">Manter formato atual</SelectItem>
+                  <SelectItem value="reels" className="py-2 px-2.5">Reels Curto (Roteiro em 3 Cenas)</SelectItem>
+                  <SelectItem value="carrossel" className="py-2 px-2.5">Carrossel Educativo (4 a 6 Telas)</SelectItem>
+                  <SelectItem value="card" className="py-2 px-2.5">Card Único de Alto Impacto</SelectItem>
+                  <SelectItem value="stories" className="py-2 px-2.5">Sequência de 3 Stories Interativos</SelectItem>
+                  <SelectItem value="linkedin" className="py-2 px-2.5">Artigo / Post Executivo (LinkedIn)</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-200 mb-1">Ajustar Tom de Voz:</label>
+              <label className="block text-xs font-bold text-slate-200 mb-1.5">Ajustar Tom de Voz:</label>
               <Select value={selectedTone} onValueChange={(val) => val && setSelectedTone(val)}>
-                <SelectTrigger className="bg-slate-950 border-slate-600 text-white text-xs w-full">
+                <SelectTrigger className="bg-slate-950 border-slate-600 text-white text-sm h-10 w-full">
                   <SelectValue placeholder="Manter tom padrão da persona" />
                 </SelectTrigger>
-                <SelectContent className="bg-slate-900 border-slate-700 text-slate-100 text-xs">
-                  <SelectItem value="manter">Manter tom recomendado da Persona</SelectItem>
-                  <SelectItem value="descontraido">Mais Jovem e Bem-humorado</SelectItem>
-                  <SelectItem value="provocativo">Mais Provocativo e Urgente</SelectItem>
-                  <SelectItem value="emocional">Mais Afetivo e Comunitário</SelectItem>
-                  <SelectItem value="b2b">Mais Executivo e Focado em Negócios</SelectItem>
+                <SelectContent className="bg-slate-900 border-slate-700 text-slate-100 text-sm min-w-[280px] p-1.5">
+                  <SelectItem value="manter" className="py-2 px-2.5">Manter tom da Persona</SelectItem>
+                  <SelectItem value="descontraido" className="py-2 px-2.5">Mais Jovem e Descontraído</SelectItem>
+                  <SelectItem value="provocativo" className="py-2 px-2.5">Mais Provocativo e Urgente</SelectItem>
+                  <SelectItem value="emocional" className="py-2 px-2.5">Mais Afetivo e Comunitário</SelectItem>
+                  <SelectItem value="b2b" className="py-2 px-2.5">Mais Executivo / B2B</SelectItem>
                 </SelectContent>
               </Select>
             </div>

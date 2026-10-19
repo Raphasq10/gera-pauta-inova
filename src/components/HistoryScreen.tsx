@@ -114,19 +114,19 @@ ${pitch.legenda}
               placeholder="Buscar por termo ou headline..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="bg-slate-950 border-slate-700 text-slate-100 pl-8 text-xs h-9"
+              className="bg-slate-950 border-slate-700 text-slate-100 pl-8 text-sm h-10"
               maxLength={100}
             />
           </div>
 
           <Select value={filterPersona} onValueChange={(val) => val && setFilterPersona(val)}>
-            <SelectTrigger className="bg-slate-950 border-slate-700 text-slate-100 text-xs h-9 w-48">
+            <SelectTrigger className="bg-slate-950 border-slate-700 text-slate-100 text-sm h-10 w-56">
               <SelectValue placeholder="Todas as Personas" />
             </SelectTrigger>
-            <SelectContent className="bg-slate-900 border-slate-700 text-slate-100 text-xs">
-              <SelectItem value="all">Todas as Personas</SelectItem>
+            <SelectContent className="bg-slate-900 border-slate-700 text-slate-100 text-sm min-w-[260px] p-1.5">
+              <SelectItem value="all" className="py-2 px-2.5">Todas as Personas</SelectItem>
               {personas.map((p) => (
-                <SelectItem key={p.id} value={p.id}>
+                <SelectItem key={p.id} value={p.id} className="py-2 px-2.5">
                   {p.name.split("(")[0]}
                 </SelectItem>
               ))}

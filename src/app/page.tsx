@@ -112,39 +112,41 @@ export default function Home() {
       {/* ÁREA PRINCIPAL COM AS 4 TELAS EM ABAS */}
       <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 space-y-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="bg-slate-900 border border-slate-700 p-1.5 rounded-xl grid grid-cols-2 sm:grid-cols-4 max-w-3xl mx-auto h-auto shadow-md">
-            <TabsTrigger
-              value="generator"
-              className="data-[state=active]:bg-amber-500 data-[state=active]:text-slate-950 text-xs font-bold py-2.5 gap-1.5 text-slate-300 hover:text-white transition cursor-pointer"
-            >
-              <Sparkles className="w-4 h-4" />
-              1. Gerador de Pautas
-            </TabsTrigger>
+          <div className="flex justify-center w-full">
+            <TabsList className="w-full max-w-4xl bg-slate-900/90 border border-slate-700/80 p-1.5 rounded-2xl grid grid-cols-2 sm:grid-cols-4 gap-1.5 shadow-xl backdrop-blur">
+              <TabsTrigger
+                value="generator"
+                className="data-active:bg-amber-500 data-active:text-slate-950 data-[state=active]:bg-amber-500 data-[state=active]:text-slate-950 text-xs sm:text-sm font-bold py-2.5 sm:py-3 px-3 gap-2 text-slate-300 hover:text-white transition-all cursor-pointer rounded-xl flex items-center justify-center shadow-none data-active:shadow-md"
+              >
+                <Sparkles className="w-4 h-4 shrink-0" />
+                <span>1. Gerador de Pautas</span>
+              </TabsTrigger>
 
-            <TabsTrigger
-              value="history"
-              className="data-[state=active]:bg-amber-500 data-[state=active]:text-slate-950 text-xs font-bold py-2.5 gap-1.5 text-slate-300 hover:text-white transition cursor-pointer"
-            >
-              <History className="w-4 h-4" />
-              2. Histórico ({pitches.length})
-            </TabsTrigger>
+              <TabsTrigger
+                value="history"
+                className="data-active:bg-amber-500 data-active:text-slate-950 data-[state=active]:bg-amber-500 data-[state=active]:text-slate-950 text-xs sm:text-sm font-bold py-2.5 sm:py-3 px-3 gap-2 text-slate-300 hover:text-white transition-all cursor-pointer rounded-xl flex items-center justify-center shadow-none data-active:shadow-md"
+              >
+                <History className="w-4 h-4 shrink-0" />
+                <span>2. Histórico ({pitches.length})</span>
+              </TabsTrigger>
 
-            <TabsTrigger
-              value="personas"
-              className="data-[state=active]:bg-amber-500 data-[state=active]:text-slate-950 text-xs font-bold py-2.5 gap-1.5 text-slate-300 hover:text-white transition cursor-pointer"
-            >
-              <Users className="w-4 h-4" />
-              3. Personas & Dados
-            </TabsTrigger>
+              <TabsTrigger
+                value="personas"
+                className="data-active:bg-amber-500 data-active:text-slate-950 data-[state=active]:bg-amber-500 data-[state=active]:text-slate-950 text-xs sm:text-sm font-bold py-2.5 sm:py-3 px-3 gap-2 text-slate-300 hover:text-white transition-all cursor-pointer rounded-xl flex items-center justify-center shadow-none data-active:shadow-md"
+              >
+                <Users className="w-4 h-4 shrink-0" />
+                <span>3. Personas & Dados</span>
+              </TabsTrigger>
 
-            <TabsTrigger
-              value="hub"
-              className="data-[state=active]:bg-amber-500 data-[state=active]:text-slate-950 text-xs font-bold py-2.5 gap-1.5 text-slate-300 hover:text-white transition cursor-pointer"
-            >
-              <Layers className="w-4 h-4" />
-              4. Hub do Festival
-            </TabsTrigger>
-          </TabsList>
+              <TabsTrigger
+                value="hub"
+                className="data-active:bg-amber-500 data-active:text-slate-950 data-[state=active]:bg-amber-500 data-[state=active]:text-slate-950 text-xs sm:text-sm font-bold py-2.5 sm:py-3 px-3 gap-2 text-slate-300 hover:text-white transition-all cursor-pointer rounded-xl flex items-center justify-center shadow-none data-active:shadow-md"
+              >
+                <Layers className="w-4 h-4 shrink-0" />
+                <span>4. Hub do Festival</span>
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
           {/* TELA 1: GERADOR DE PAUTAS */}
           <TabsContent value="generator" className="outline-none focus:ring-0">
