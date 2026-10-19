@@ -1,32 +1,36 @@
 import { GoogleGenAI } from "@google/genai";
 
 /**
- * Motor de Conexão Oficial Google Gemini
+ * Conexão Oficial Google AI Studio / Gemini API
+ * Conforme documentação oficial: https://ai.google.dev/gemini-api/docs/get-started
  * 
- * Modelos verificados e ativos no Google AI Studio:
- * - gemini-3.6-flash (Ultra-rápido, alta disponibilidade, 200 OK comprovado)
- * - gemini-3.5-flash (Ultra-rápido, alta disponibilidade, 200 OK comprovado)
- * - gemini-3.8-flash (Modelo 2026 - quando não estiver em pico 503)
- * - gemini-3.7-flash
+ * Modelos ativos auditados na chave do usuário:
+ * 1. gemini-3.8-flash (Modelo principal de 2026)
+ * 2. gemini-3.6-flash (Disponibilidade imediata / 200 OK)
+ * 3. gemini-flash-lite-latest (Ativo no Free Tier)
+ * 4. gemini-3.5-flash-lite (Ativo no Free Tier)
+ * 5. gemini-3-flash-preview (Ativo no Free Tier)
+ * 6. gemma-4-31b-it (Ativo no Free Tier)
  */
 export async function callGoogleGeminiInteractions(
   apiKey: string,
   prompt: string
 ): Promise<{ text: string; model: string }> {
-  // Cascata otimizada: prioriza os modelos com disponibilidade 100% imediata
   const models = [
-    "gemini-3.6-flash",
-    "gemini-3.5-flash",
     "gemini-3.8-flash",
-    "gemini-3.7-flash"
+    "gemini-3.6-flash",
+    "gemini-flash-lite-latest",
+    "gemini-3.5-flash-lite",
+    "gemini-3-flash-preview",
+    "gemma-4-31b-it"
   ];
 
   let lastErr: any = null;
 
-  // 1. Chamada REST direta para a API oficial do Google AI (mais rápida e sem ruído de abstração)
+  // 1. Tenta chamada direta oficial REST v1beta (generateContent)
   for (const model of models) {
     try {
-      console.log(`[Google Gemini] Conectando ao modelo: ${model}...`);
+      console.log(`[Google Gemini API] Solicitando geração para ${model}...`);
       const res = await fetch(
         `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(apiKey)}`,
         {
@@ -35,54 +39,52 @@ export async function callGoogleGeminiInteractions(
           body: JSON.stringify({
             contents: [{ role: "user", parts: [{ text: prompt }] }],
             generationConfig: {
-              temperature: 0.7,
-              topP: 0.95
+              temperature: 0.7
             }
           })
         }
       );
 
-      if (!res.ok) {
-        const errorText = await res.text();
-        console.warn(`[Google Gemini] Modelo ${model} retornou status ${res.status}:`, errorText);
-        continue;
+      if (res.status === 200) {
+        const data = await res.json();
+        const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+        if (text.trim()) {
+          console.log(`[Google Gemini API] ✅ Resposta gerada com sucesso pelo modelo ${model}!`);
+          return { text: text.trim(), model };
+        }
+      } else {
+        const errJson = await res.json().catch(() => ({}));
+        const errMsg = errJson?.error?.message || `HTTP ${res.status}`;
+        console.warn(`[Google Gemini API] Modelo ${model} indisponível (${res.status}): ${errMsg.slice(0, 100)}`);
       }
-
-      const data = await res.json();
-      const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
-      if (text.trim()) {
-        console.log(`[Google Gemini] ✅ SUCESSO com modelo ${model}!`);
-        return { text: text.trim(), model };
-      }
-    } catch (restErr: any) {
-      console.warn(`[Google Gemini] Falha de rede para ${model}:`, restErr?.message || restErr);
-      lastErr = restErr;
+    } catch (err: any) {
+      console.warn(`[Google Gemini API] Erro ao consultar ${model}:`, err?.message || err);
+      lastErr = err;
     }
   }
 
-  // 2. Fallback via SDK oficial @google/genai
+  // 2. Fallback via SDK oficial @google/genai (Interactions API / generateContent)
   try {
     const ai = new GoogleGenAI({ apiKey });
-    for (const model of models) {
+    for (const model of ["gemini-3.8-flash", "gemini-3.6-flash"]) {
       try {
-        console.log(`[Google Gemini SDK] Tentando fallback SDK para ${model}...`);
-        const response = await ai.models.generateContent({
+        console.log(`[Google SDK] Tentando interactions.create com ${model}...`);
+        const interaction: any = await ai.interactions.create({
           model,
-          contents: prompt
+          input: prompt
         });
-
-        const text = response?.text || "";
-        if (text.trim()) {
-          console.log(`[Google Gemini SDK] ✅ SUCESSO via SDK com ${model}!`);
-          return { text: text.trim(), model };
+        const out = interaction?.output_text || "";
+        if (out.trim()) {
+          console.log(`[Google SDK] ✅ Sucesso via Interactions SDK com ${model}!`);
+          return { text: out.trim(), model };
         }
       } catch (sdkErr: any) {
-        console.warn(`[Google Gemini SDK] Falha no modelo ${model}:`, sdkErr?.message || sdkErr);
+        console.warn(`[Google SDK] Falha com ${model}:`, sdkErr?.message || sdkErr);
         lastErr = sdkErr;
       }
     }
   } catch (initErr) {
-    console.warn("[Google Gemini SDK] Falha ao inicializar SDK:", initErr);
+    console.warn("[Google SDK] Erro ao inicializar SDK:", initErr);
   }
 
   throw lastErr || new Error("Nenhum modelo Gemini respondeu com sucesso.");
