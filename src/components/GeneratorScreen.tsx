@@ -196,12 +196,12 @@ ${pitch.legenda}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             {/* 1. Seletor de Persona */}
             <div>
-              <label htmlFor="select-persona" className="block text-xs font-semibold text-slate-300 mb-1.5 flex items-center gap-1.5">
+              <label htmlFor="select-persona" className="block text-xs font-bold text-slate-100 mb-1.5 flex items-center gap-1.5">
                 <Users className="w-3.5 h-3.5 text-blue-400" />
                 1. Persona-Alvo *
               </label>
               <Select value={selectedPersonaId} onValueChange={(val) => val && setSelectedPersonaId(val)}>
-                <SelectTrigger id="select-persona" className="bg-slate-950 border-slate-700 text-slate-100 text-xs">
+                <SelectTrigger id="select-persona" className="bg-slate-950 border-slate-600 text-white font-medium text-xs focus:border-amber-400 focus:ring-1 focus:ring-amber-400">
                   <SelectValue placeholder="Selecione a Persona" />
                 </SelectTrigger>
                 <SelectContent className="bg-slate-900 border-slate-700 text-slate-100 text-xs">
@@ -213,18 +213,18 @@ ${pitch.legenda}
                 </SelectContent>
               </Select>
               {fieldErrors.personaId && (
-                <span className="text-[11px] text-rose-400 mt-1 block">{fieldErrors.personaId}</span>
+                <span className="text-[11px] text-rose-400 mt-1 block font-medium">{fieldErrors.personaId}</span>
               )}
             </div>
 
             {/* 2. Seletor de Atualização / Foco do Festival */}
             <div>
-              <label htmlFor="select-update" className="block text-xs font-semibold text-slate-300 mb-1.5 flex items-center gap-1.5">
+              <label htmlFor="select-update" className="block text-xs font-bold text-slate-100 mb-1.5 flex items-center gap-1.5">
                 <Layers className="w-3.5 h-3.5 text-amber-400" />
                 2. Foco / Novidade do Evento
               </label>
               <Select value={selectedUpdateId} onValueChange={(val) => val && setSelectedUpdateId(val)}>
-                <SelectTrigger id="select-update" className="bg-slate-950 border-slate-700 text-slate-100 text-xs">
+                <SelectTrigger id="select-update" className="bg-slate-950 border-slate-600 text-white font-medium text-xs focus:border-amber-400 focus:ring-1 focus:ring-amber-400">
                   <SelectValue placeholder="Geral do Festival" />
                 </SelectTrigger>
                 <SelectContent className="bg-slate-900 border-slate-700 text-slate-100 text-xs">
@@ -240,9 +240,9 @@ ${pitch.legenda}
 
             {/* 3. Canal de Destino */}
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5">3. Canal de Destino</label>
+              <label className="block text-xs font-bold text-slate-100 mb-1.5">3. Canal de Destino</label>
               <Select value={channel} onValueChange={(val: any) => val && setChannel(val)}>
-                <SelectTrigger className="bg-slate-950 border-slate-700 text-slate-100 text-xs">
+                <SelectTrigger className="bg-slate-950 border-slate-600 text-white font-medium text-xs focus:border-amber-400 focus:ring-1 focus:ring-amber-400">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="bg-slate-900 border-slate-700 text-slate-100 text-xs">
@@ -256,9 +256,9 @@ ${pitch.legenda}
             {/* 4. Grade Semanal & Qtd */}
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">Linha Editorial</label>
+                <label className="block text-xs font-bold text-slate-100 mb-1.5">Linha Editorial</label>
                 <Select value={weeklyTheme} onValueChange={(val: any) => val && setWeeklyTheme(val)}>
-                  <SelectTrigger className="bg-slate-950 border-slate-700 text-slate-100 text-xs">
+                  <SelectTrigger className="bg-slate-950 border-slate-600 text-white font-medium text-xs focus:border-amber-400 focus:ring-1 focus:ring-amber-400">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className="bg-slate-900 border-slate-700 text-slate-100 text-xs">
@@ -272,9 +272,9 @@ ${pitch.legenda}
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">Qtd Pautas</label>
+                <label className="block text-xs font-bold text-slate-100 mb-1.5">Qtd Pautas</label>
                 <Select value={pitchCount.toString()} onValueChange={(v) => v && setPitchCount(parseInt(v))}>
-                  <SelectTrigger className="bg-slate-950 border-slate-700 text-slate-100 text-xs">
+                  <SelectTrigger className="bg-slate-950 border-slate-600 text-white font-medium text-xs focus:border-amber-400 focus:ring-1 focus:ring-amber-400">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className="bg-slate-900 border-slate-700 text-slate-100 text-xs">
@@ -290,39 +290,39 @@ ${pitch.legenda}
           </div>
 
           {/* Mini-Painel de Dados da Persona Selecionada */}
-          <div className="bg-slate-950/80 p-3.5 rounded-xl border border-slate-800 text-xs grid grid-cols-1 md:grid-cols-4 gap-3">
+          <div className="bg-slate-950 p-4 rounded-xl border border-slate-700 text-xs grid grid-cols-1 md:grid-cols-4 gap-4 shadow-inner">
             <div>
-              <span className="text-slate-400 block text-[10px] uppercase font-bold tracking-wider">Volume Real na Base:</span>
-              <span className="font-bold text-slate-200 text-sm">
-                {currentPersona.count} adultos <span className="text-slate-400 text-xs">({currentPersona.pctOfAdults}%)</span>
+              <span className="text-slate-300 block text-[11px] uppercase font-bold tracking-wider">Volume Real na Base:</span>
+              <span className="font-extrabold text-white text-base">
+                {currentPersona.count} adultos <span className="text-amber-400 text-xs font-semibold">({currentPersona.pctOfAdults}%)</span>
               </span>
             </div>
             <div>
-              <span className="text-slate-400 block text-[10px] uppercase font-bold tracking-wider">Top 2 Interesses:</span>
-              <span className="text-slate-200">
-                {currentPersona.topInterests[0]?.label} ({currentPersona.topInterests[0]?.pct}%) e {currentPersona.topInterests[1]?.label} ({currentPersona.topInterests[1]?.pct}%)
+              <span className="text-slate-300 block text-[11px] uppercase font-bold tracking-wider">Top 2 Interesses:</span>
+              <span className="text-slate-100 font-medium leading-tight block">
+                {currentPersona.topInterests[0]?.label} <strong className="text-amber-300">({currentPersona.topInterests[0]?.pct}%)</strong> e {currentPersona.topInterests[1]?.label} <strong className="text-amber-300">({currentPersona.topInterests[1]?.pct}%)</strong>
               </span>
             </div>
             <div>
-              <span className="text-slate-400 block text-[10px] uppercase font-bold tracking-wider">Logística Principal:</span>
-              <span className="text-slate-200">
-                {currentPersona.transport[0]?.label} ({currentPersona.transport[0]?.pct}%)
+              <span className="text-slate-300 block text-[11px] uppercase font-bold tracking-wider">Logística Principal:</span>
+              <span className="text-slate-100 font-medium block">
+                {currentPersona.transport[0]?.label} <strong className="text-blue-300">({currentPersona.transport[0]?.pct}%)</strong>
               </span>
             </div>
             <div>
-              <span className="text-slate-400 block text-[10px] uppercase font-bold tracking-wider">Tom de Voz Recomendado:</span>
-              <span className="text-slate-300 italic truncate block">{currentPersona.tone}</span>
+              <span className="text-slate-300 block text-[11px] uppercase font-bold tracking-wider">Tom de Voz Recomendado:</span>
+              <span className="text-slate-200 italic font-medium truncate block">{currentPersona.tone}</span>
             </div>
           </div>
 
           {/* Campo em Destaque: Ideia Inicial / Briefing do Conteudista */}
           <div>
             <div className="flex items-center justify-between mb-1.5">
-              <label htmlFor="initial-idea" className="text-xs font-semibold text-slate-200 flex items-center gap-1.5">
+              <label htmlFor="initial-idea" className="text-xs font-bold text-white flex items-center gap-1.5">
                 <Lightbulb className="w-4 h-4 text-amber-400" />
                 💡 Ideia Inicial / Briefing do Conteudista (Opcional)
               </label>
-              <span className="text-[11px] text-slate-400">
+              <span className="text-xs font-medium text-amber-300 bg-amber-400/10 px-2 py-0.5 rounded border border-amber-400/20">
                 {initialIdea.trim() ? "✨ A IA vai transformar sua ideia em pautas completas" : "🤖 Deixe em branco para ideação 100% autônoma"}
               </span>
             </div>
@@ -331,17 +331,17 @@ ${pitch.legenda}
               placeholder="Digite um insight, trend ou ângulo que você pensou. Ex: 'Fazer um meme sobre quem deixou pra emitir ingresso na última hora' ou 'Conectar a palestra da Monja Coen com saúde mental no trabalho'."
               value={initialIdea}
               onChange={(e) => setInitialIdea(e.target.value)}
-              className="bg-slate-950 border-slate-700 text-slate-100 placeholder:text-slate-500 text-sm min-h-[85px] resize-none"
+              className="bg-slate-950 border-slate-600 text-white placeholder:text-slate-400 text-sm min-h-[90px] resize-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 font-normal leading-relaxed"
               maxLength={800}
             />
-            <div className="flex justify-between items-center text-[11px] text-slate-400 mt-1">
+            <div className="flex justify-between items-center text-xs text-slate-300 mt-1.5 font-medium">
               <span>A IA vai cruzar esta ideia com as dores da persona selecionada.</span>
-              <span className={initialIdea.length > 750 ? "text-amber-400 font-semibold" : ""}>
+              <span className={initialIdea.length > 750 ? "text-amber-400 font-bold" : "text-slate-300"}>
                 {initialIdea.length}/800 caracteres
               </span>
             </div>
             {fieldErrors.initialIdea && (
-              <span className="text-[11px] text-rose-400 mt-1 block">{fieldErrors.initialIdea}</span>
+              <span className="text-[11px] text-rose-400 mt-1 block font-medium">{fieldErrors.initialIdea}</span>
             )}
           </div>
         </CardContent>
@@ -350,16 +350,16 @@ ${pitch.legenda}
           <Button
             onClick={handleGenerate}
             disabled={isLoading}
-            className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-bold px-6 py-2.5 shadow-lg shadow-orange-950/30 gap-2 cursor-pointer transition disabled:opacity-50"
+            className="bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-600 hover:to-orange-700 text-slate-950 font-black px-7 py-3 shadow-xl shadow-orange-950/40 gap-2 cursor-pointer transition disabled:opacity-50 text-sm tracking-wide"
           >
             {isLoading ? (
               <>
-                <RefreshCw className="w-4 h-4 animate-spin" />
+                <RefreshCw className="w-4 h-4 animate-spin text-slate-950" />
                 Validando Briefing e Gerando...
               </>
             ) : (
               <>
-                <Sparkles className="w-4 h-4" />
+                <Sparkles className="w-4 h-4 text-slate-950" />
                 Gerar {pitchCount} Pauta(s) com IA
               </>
             )}
@@ -435,40 +435,40 @@ ${pitch.legenda}
                 <CardContent className="space-y-4 pt-4 text-xs">
                   {/* Bloco 1: Mote */}
                   <div>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-amber-400 flex items-center gap-1">
+                    <span className="text-[11px] font-extrabold uppercase tracking-wider text-amber-400 flex items-center gap-1">
                       🎯 Mote do Conteúdo:
                     </span>
-                    <p className="text-slate-200 text-sm mt-0.5 font-medium leading-snug">{pitch.mote}</p>
+                    <p className="text-white text-sm mt-1 font-semibold leading-relaxed">{pitch.mote}</p>
                   </div>
 
                   {/* Bloco 2: Headline */}
-                  <div className="bg-slate-950 p-3 rounded-lg border border-slate-800">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
+                  <div className="bg-slate-950 p-3.5 rounded-lg border border-slate-700">
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-slate-300 block mb-1">
                       🖼️ Headline (O que vai na Arte):
                     </span>
-                    <p className="text-amber-200 text-sm font-bold">&ldquo;{pitch.headlineArte}&rdquo;</p>
+                    <p className="text-amber-300 text-sm font-bold">&ldquo;{pitch.headlineArte}&rdquo;</p>
                   </div>
 
                   {/* Bloco 3: Legenda */}
                   <div>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-slate-300 block mb-1">
                       ✍️ Legenda para Redes:
                     </span>
-                    <div className="bg-slate-950/70 p-3 rounded-lg border border-slate-800/80 text-slate-300 font-mono text-[11px] whitespace-pre-line max-h-48 overflow-y-auto leading-relaxed">
+                    <div className="bg-slate-950 p-3.5 rounded-lg border border-slate-700 text-slate-100 font-sans text-xs whitespace-pre-line max-h-56 overflow-y-auto leading-relaxed">
                       {pitch.legenda}
                     </div>
                   </div>
 
                   {/* Bloco 4: Formato + Justificativa com Dados */}
-                  <div className="bg-slate-950/40 p-2.5 rounded border border-slate-800/60 space-y-1">
+                  <div className="bg-slate-950 p-3 rounded-lg border border-slate-700 space-y-1.5">
                     <div className="flex items-center gap-2">
-                      <span className="text-[10px] font-bold uppercase text-slate-400">📐 Formato:</span>
-                      <Badge className="bg-emerald-500/10 text-emerald-300 border-emerald-500/30 text-[11px]">
+                      <span className="text-[11px] font-bold uppercase text-slate-300">📐 Formato:</span>
+                      <Badge className="bg-emerald-500/20 text-emerald-300 border-emerald-500/40 text-xs font-semibold">
                         {pitch.formato}
                       </Badge>
                     </div>
-                    <p className="text-[11px] text-slate-400 leading-normal">
-                      <strong className="text-slate-300">Justificativa com dados:</strong> {pitch.justificativaFormato}
+                    <p className="text-xs text-slate-200 leading-normal">
+                      <strong className="text-amber-300 font-semibold">Justificativa com dados:</strong> {pitch.justificativaFormato}
                     </p>
                   </div>
                 </CardContent>
@@ -479,7 +479,7 @@ ${pitch.legenda}
                     variant="outline"
                     size="sm"
                     onClick={() => setActivePitchForRefine(pitch)}
-                    className="border-slate-700 hover:bg-slate-800 text-slate-200 text-xs gap-1.5"
+                    className="border-slate-600 hover:bg-slate-800 text-slate-100 font-semibold text-xs gap-1.5"
                   >
                     <RefreshCw className="w-3.5 h-3.5 text-amber-400" />
                     Refazer / Ajustar
@@ -490,7 +490,7 @@ ${pitch.legenda}
                     variant="default"
                     size="sm"
                     onClick={() => handleCopy(pitch)}
-                    className="bg-slate-800 hover:bg-slate-700 text-white text-xs gap-1.5"
+                    className="bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs gap-1.5 border border-slate-700"
                   >
                     {copiedId === pitch.id ? (
                       <>
