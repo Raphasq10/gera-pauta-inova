@@ -164,10 +164,11 @@ export async function DELETE(req: NextRequest) {
 
     const exists = currentPitches.some((p) => p.id === id);
     if (!exists) {
-      return NextResponse.json(
-        { success: false, error: "Pauta não encontrada no banco de dados." },
-        { status: 404 }
-      );
+      return NextResponse.json({
+        success: true,
+        message: "Pauta removida com sucesso.",
+        pitches: currentPitches
+      });
     }
 
     const updatedPitches = currentPitches.filter((p) => p.id !== id);

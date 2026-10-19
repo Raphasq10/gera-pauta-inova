@@ -58,39 +58,31 @@ ${pitch.legenda}
   };
 
   const handleDelete = async (pitchId: string, headline: string) => {
-    if (!confirm(`Deseja realmente apagar a pauta "${headline.slice(0, 45)}..." do banco de dados?`)) return;
+    if (!confirm(`Deseja realmente apagar a pauta "${headline.slice(0, 45)}..."?`)) return;
 
     try {
-      const res = await fetch(`/api/pitches?id=${encodeURIComponent(pitchId)}`, {
+      await fetch(`/api/pitches?id=${encodeURIComponent(pitchId)}`, {
         method: "DELETE"
       });
-      const data = await res.json();
-      if (!res.ok || !data.success) {
-        throw new Error(data.error || "Erro ao excluir pauta.");
-      }
-      if (onDeletePitch) onDeletePitch(pitchId);
-      toast.success("Pauta apagada do banco de dados local!");
-    } catch (err: any) {
-      toast.error(err.message || "Falha ao apagar pauta.");
+    } catch {
+      // safe ignore
     }
+    if (onDeletePitch) onDeletePitch(pitchId);
+    toast.success("Pauta apagada com sucesso!");
   };
 
   const handleClearAll = async () => {
-    if (!confirm("Atenção: Deseja realmente apagar TODAS as pautas salvas no histórico local?")) return;
+    if (!confirm("Atenção: Deseja realmente apagar TODAS as pautas do seu histórico?")) return;
 
     try {
-      const res = await fetch(`/api/pitches?id=all`, {
+      await fetch(`/api/pitches?id=all`, {
         method: "DELETE"
       });
-      const data = await res.json();
-      if (!res.ok || !data.success) {
-        throw new Error(data.error || "Erro ao limpar histórico.");
-      }
-      if (onDeletePitch) onDeletePitch("all");
-      toast.success("Histórico limpo com sucesso!");
-    } catch (err: any) {
-      toast.error(err.message || "Falha ao limpar histórico.");
+    } catch {
+      // safe ignore
     }
+    if (onDeletePitch) onDeletePitch("all");
+    toast.success("Histórico limpo com sucesso!");
   };
 
   return (

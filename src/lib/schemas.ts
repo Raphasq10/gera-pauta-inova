@@ -135,6 +135,7 @@ export type PitchContentValues = z.infer<typeof PitchContentSchema>;
 // Schema da Feature 5: Requisição para Refinar / Ajustar Pauta Específica
 export const RefinePitchRequestSchema = z.object({
   pitchId: z.string().trim().min(1, "O ID da pauta é obrigatório."),
+  pitch: PitchContentSchema.optional(),
   instruction: z.string().trim().max(600, "A instrução não pode ultrapassar 600 caracteres.").optional().or(z.literal("")),
   format: z.string().trim().max(100).default("manter"),
   tone: z.string().trim().max(100).default("manter"),

@@ -43,6 +43,7 @@ export function RefinePitchModal({ pitch, isOpen, onClose, onApplyRefine, userAp
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           pitchId: pitch.id,
+          pitch,
           instruction: instruction.trim(),
           format: selectedFormat,
           tone: selectedTone,

@@ -141,20 +141,19 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { pitchId, instruction, format, tone, userApiKey } = validation.data;
+    const { pitchId, pitch: clientPitch, instruction, format, tone, userApiKey } = validation.data;
 
-    // 2. Localizar a pauta a ser refinada no banco de dados local
+    // 2. Localizar a pauta a ser refinada (via payload do cliente ou banco local)
     const pitches = getSavedPitches();
     const pitchIndex = pitches.findIndex((p) => p.id === pitchId);
+    const currentPitch = clientPitch || (pitchIndex !== -1 ? pitches[pitchIndex] : null);
 
-    if (pitchIndex === -1) {
+    if (!currentPitch) {
       return NextResponse.json(
         { success: false, error: "Pauta não encontrada no histórico para ajuste." },
         { status: 404 }
       );
     }
-
-    const currentPitch = pitches[pitchIndex];
 
     // Salvar estado atual no versionamento antes de reescrever
     const previousVersion = {
@@ -279,9 +278,11 @@ RETORNE EXCLUSIVAMENTE UM OBJETO JSON VÁLIDO:
       previousVersions: [...(currentPitch.previousVersions || []), previousVersion]
     };
 
-    // Atualiza no banco de dados local
-    pitches[pitchIndex] = updatedPitch;
-    savePitches(pitches);
+    // Atualiza no banco de dados local se existir no arquivo
+    if (pitchIndex !== -1) {
+      pitches[pitchIndex] = updatedPitch;
+      savePitches(pitches);
+    }
 
     return NextResponse.json({
       success: true,
