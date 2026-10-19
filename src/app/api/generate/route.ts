@@ -69,35 +69,46 @@ function generateOfflinePitches(
   const transport = persona.transport?.[0] || { label: "transporte", pct: 50 };
 
   // Banco de arquétipos criativos distintos para garantir que Pauta #1, #2, #3, #4, #5 NUNCA sejam iguais
+  const isDrauzio = ideaLower.includes("drauzio") || ideaLower.includes("médic") || ideaLower.includes("saúde");
+  const isViralEdit = ideaLower.includes("edit") || ideaLower.includes("fancam") || ideaLower.includes("viral") || ideaLower.includes("curiosidade");
+
   const creativeAngles = [
     // ÂNGULO 1: Social / FOMO / Experiência Coletiva
     {
       build: (format: string, interest: any, goal: any) => {
-        if (isAboutFriends) {
+        if (isDrauzio && isViralEdit) {
           return {
-            mote: `[${themeLabels[weeklyTheme]}] A experiência do Festival fica 10x melhor em galera: transformar o passeio com os amigos da faculdade/trabalho em um rolê épico que mistura palestras, tecnologia e shows gratuitos.`,
-            headlineArte: `Marque aqui o grupo de amigos que vai fechar o semestre com você no Festival Iguassu Inova! 🔥`,
-            legenda: `Sabe aquele rolê que junta todo mundo — desde quem quer ver robótica e inteligência artificial até quem só quer curtir um showzão no fim da tarde? 🙌✨\n\nO Festival Iguassu Inova 2026 não é lugar pra ir sozinho! Chame a sua turma porque de 25 a 28 de novembro o Itaipu Parquetec vira o maior ponto de encontro da Tríplice Fronteira:\n\n🎸 Shows nacionais gratuitos (Emicida, Duda Beat e muito mais)\n🚀 6 Mundos interativos com games, ciência e futuro\n🎓 Certificado oficial de horas complementares pra salvar o semestre\n🍔 Feira gastronômica e espaços de convivência\n\n⚠️ O ingresso é 100% GRATUITO, mas os lotes no app Yazo Tickets são limitados!\n\n👉 Já encaminha esse post no grupo do WhatsApp da turma e garanta seu passaporte no link da bio!\n\n#FestivalIguassuInova2026 #RolêEmFoz #UniversitáriosFoz #ItaipuParquetec`
+            mote: `[Vídeo Estilo Fancam/Edit & Curiosidades]: humanizar a trajetória do Dr. Drauzio Varella com alta retenção, conectando causas sociais, Carandiru e +50 anos de carreira com a persona ${persona.name}.`,
+            headlineArte: `Pioneirismo, Carandiru e +50 anos de carreira: o que você não sabia sobre o Dr. Drauzio Varella 🎬🩺`,
+            legenda: `Ícone da saúde pública, pioneiro na divulgação científica e com mais de 5 décadas dedicadas a cuidar de pessoas: Dr. Drauzio Varella é presença confirmada no Festival Iguassu Inova 2026! 🩺✨\n\nMuito além dos consultórios, a trajetória dele é marcada por coragem, atuação histórica no Carandiru e o dom raro de traduzir a ciência em uma linguagem acessível para todo o Brasil.\n\n📍 Onde: Itaipu Parquetec (Foz do Iguaçu - PR)\n📅 Quando: 25 a 28 de Novembro de 2026\n🎟️ Entrada: 100% Gratuita (retirada antecipada pelo app Yazo Tickets)\n🎓 Certificado oficial de participação\n\nSalve esse vídeo e marque aqui quem não pode perder esse momento histórico! 👇\n\n#FestivalIguassuInova2026 #DrauzioVarella #SaudePublica #ItaipuParquetec #FozDoIguacu`
           };
         }
-        if (isAboutMeme) {
+        if (isDrauzio) {
           return {
-            mote: `[${themeLabels[weeklyTheme]}] Humor de identificação imediata: quebrar a tensão da rotina de ${persona.name.split("(")[0].trim()} mostrando o Festival como o alívio perfeito (e produtivo).`,
-            headlineArte: `Expectativa: estudar quieto em casa / Realidade: eu e minha dupla no Itaipu Parquetec garantindo horas e curtindo show grátis 😎`,
-            legenda: `Quem disse que pra evoluir na carreira precisa sofrer trancado numa sala? 😂\n\nNo Festival Iguassu Inova 2026 você resolve metade da sua vida acadêmica e profissional em 4 dias — e ainda se diverte de verdade!\n\nEnquanto garante networking em ${interest.label} e palestras com gigantes do mercado (${baseTitle}), você recarrega as energias nos shows do FIMS.\n\n📍 De 25 a 28 de Novembro no Itaipu Parquetec\n🎟️ Entrada 100% Franca (emita no app Yazo Tickets pelo link da bio)\n\nMarca aqui quem vai ser seu parceiro(a) oficial de credencial! 👇\n\n#FestivalIguassuInova2026 #HumorUniversitário #InovaçãoFoz #ItaipuParquetec`
+            mote: `[Aula Magna de Saúde & Ciência]: posicionar a palestra do Dr. Drauzio Varella como o encontro imperdível do ano no Festival para ${persona.name}.`,
+            headlineArte: `Dr. Drauzio Varella em Foz: uma aula magna de ciência, ética e saúde no Festival Iguassu Inova! 🩺🌟`,
+            legenda: `Uma das mentes mais respeitadas da medicina brasileira desembarca em Foz do Iguaçu para um encontro transformador no Festival Iguassu Inova 2026! 🩺✨\n\nDe 25 a 28 de novembro, o Itaipu Parquetec será palco de reflexões profundas sobre o futuro da saúde, causas sociais e inovação humana com o Dr. Drauzio Varella.\n\n🎟️ O acesso é 100% GRATUITO, mas as vagas no auditório são limitadas! Emita seu passaporte no app Yazo Tickets pelo link da bio.\n\n#FestivalIguassuInova2026 #DrauzioVarella #ItaipuParquetec`
           };
         }
         if (isIdeaGiven) {
+          const cleanHead = ideaText.length > 60 ? ideaText.slice(0, 60) + "..." : ideaText;
           return {
-            mote: `[${themeLabels[weeklyTheme]}] Ângulo Provocativo & Social inspirado no briefing: conectar o desejo de ${goal.label.toLowerCase()} com a programação vibrante de ${baseTitle}.`,
-            headlineArte: `Você não vai deixar pra ouvir falar só depois que acabar, né? Viva tudo o que o Festival preparou!`,
-            legenda: `Tem coisas que a gente só entende vivendo na pele! ⚡\n\nInspirado no que mais importa para quem vive em Foz e região: o Festival Iguassu Inova 2026 reuniu em um só lugar experiências de ${interest.label.toLowerCase()}, grandes nomes como ${baseTitle} e oportunidades reais de conexão.\n\nPor que você precisa estar lá de 25 a 28 de novembro?\n✅ Acesso livre aos 6 Mundos do evento no Itaipu Parquetec\n✅ Programação pensada para quem busca ${goal.label.toLowerCase()}\n✅ Inscrição 100% gratuita e digital\n\nChame quem faz parte da sua jornada e emita agora seu passaporte gratuito no link da bio (Yazo Tickets)!\n\n#FestivalIguassuInova2026 #ItaipuParquetec #FuturoEmFoz #${persona.category}`
+            mote: `[Atendimento Direto ao Briefing]: pauta focada na ideia "${ideaText.slice(0, 45)}...", direcionando para os interesses de ${persona.name}.`,
+            headlineArte: `${cleanHead} 🔥`,
+            legenda: `Você pediu e o Festival Iguassu Inova 2026 preparou uma experiência sob medida!\n\n${ideaText}\n\nDe 25 a 28 de novembro no Itaipu Parquetec:\n🚀 6 Mundos Temáticos com tecnologias e ciência\n🎸 Shows nacionais gratuitos e espaço gastronômico\n🎓 Certificado oficial de participação\n\nGaranta seu passaporte gratuito pelo link da bio no app Yazo Tickets!\n\n#FestivalIguassuInova2026 #ItaipuParquetec #${persona.category}`
+          };
+        }
+        if (isAboutFriends) {
+          return {
+            mote: `[${themeLabels[weeklyTheme]}] A experiência do Festival fica 10x melhor em galera: transformar o passeio com os amigos em um rolê épico.`,
+            headlineArte: `Marque aqui o grupo de amigos que vai fechar o semestre com você no Festival Iguassu Inova! 🔥`,
+            legenda: `Sabe aquele rolê que junta todo mundo — desde tecnologia até shows no fim da tarde? 🙌✨\n\nO Festival Iguassu Inova 2026 não é lugar pra ir sozinho! Chame a sua turma de 25 a 28 de novembro no Itaipu Parquetec.\n\n#FestivalIguassuInova2026 #ItaipuParquetec`
           };
         }
         return {
           mote: `[${themeLabels[weeklyTheme]}] Gancho de Impacto Direto: posicionar ${baseTitle} como o evento imperdível do ano para ${persona.name}.`,
           headlineArte: `O maior encontro de ciência, negócios e música da Tríplice Fronteira é 100% gratuito.`,
-          legenda: `Prepare-se para 4 dias que vão virar a chave da sua visão de futuro! 🚀\n\nDe 25 a 28 de novembro, o Itaipu Parquetec abre as portas para o Festival Iguassu Inova 2026 com destaque para ${baseTitle}.\n\nSeja para ${goal.label.toLowerCase()} ou mergulhar nas novidades de ${interest.label.toLowerCase()}, este é o seu lugar.\n\n🎟️ Garanta seu passaporte digital gratuito na Yazo Tickets (link na bio)!\n\n#FestivalIguassuInova2026 #ItaipuParquetec #${persona.category}`
+          legenda: `Prepare-se para 4 dias que vão virar a chave da sua visão de futuro! 🚀\n\nDe 25 a 28 de novembro, o Itaipu Parquetec abre as portas para o Festival Iguassu Inova 2026.\n\n#FestivalIguassuInova2026 #ItaipuParquetec`
         };
       }
     },
@@ -105,24 +116,24 @@ function generateOfflinePitches(
     // ÂNGULO 2: Guia Prático / Roteiro / Checklist ("Tudo que temos no festival")
     {
       build: (format: string, interest: any, goal: any) => {
-        if (isAboutFriends) {
+        if (isDrauzio) {
           return {
-            mote: `[${themeLabels[weeklyTheme]}] Roteiro Prático de Grupo: mostrar de forma visual "tudo o que tem para fazer com os amigos" dentro do Itaipu Parquetec, facilitando a combinação da carona/ônibus.`,
-            headlineArte: `Roteiro perfeito pra curtir o Festival Iguassu Inova com a galera (Sem gastar 1 real!) 🗺️✨`,
-            legenda: `Quer um motivo pra tirar a galera de casa entre os dias 25 e 28 de novembro? Aqui estão 4 motivos prontos pra jogar no grupo dos amigos: 👇\n\n1️⃣ TARDE DE IMERSÃO: Palestras interativas, arenas de inovação e projetos incríveis no ${worldName}.\n2️⃣ CERTIFICADO GARANTIDO: Valide horas complementares enquanto aprende sobre ${interest.label.toLowerCase()}.\n3️⃣ FIM DE TARDE HISTÓRICO: Pôr do sol no Parquetec + Shows Nacionais no palco do FIMS.\n4️⃣ LOGÍSTICA FÁCIL: Combine o ponto de encontro! Linhas de ônibus especiais e estacionamento organizado.\n\n💡 Dica de ouro: Não deixe ninguém do grupo ficar de fora! Todo mundo precisa baixar o app Yazo Tickets e emitir o ingresso gratuito individualmente.\n\nSalve este roteiro nos favoritos e compartilhe com seus amigos! 📲\n\n#FestivalIguassuInova2026 #RoteiroComAmigos #FozDoIguaçu #ItaipuParquetec`
+            mote: `[Curiosidades & Fatos Marcantes]: lista dinâmica de fatos curiosos e marcantes da trajetória do Dr. Drauzio para gerar compartilhamento e engajamento.`,
+            headlineArte: `5 curiosidades que provam por que o Dr. Drauzio Varella é uma lenda da ciência brasileira 📌🙌`,
+            legenda: `Você sabia que muito antes dos vídeos virais, o Dr. Drauzio já quebrava tabus e transformava a saúde pública no Brasil? 🩺\n\nConfira o que torna a presença dele no Festival Iguassu Inova 2026 tão imperdível:\n\n1️⃣ Pioneirismo absoluto na luta contra o tabagismo e epidemias\n2️⃣ Atuação marcante no sistema prisional e lições de humanidade no Carandiru\n3️⃣ O talento único de democratizar temas médicos complexos em linguagem acessível\n4️⃣ Mais de meio século de dedicação contínua à medicina\n5️⃣ Maratonista experiente aos mais de 80 anos de idade!\n\nDe 25 a 28 de novembro, viva esse momento histórico ao vivo no Itaipu Parquetec com entrada franca!\n\n📲 Garanta seu passaporte gratuito pelo link da bio no app Yazo Tickets.\n\n#FestivalIguassuInova2026 #Curiosidades #DrauzioVarella #ItaipuParquetec`
           };
         }
         if (isIdeaGiven) {
           return {
-            mote: `[${themeLabels[weeklyTheme]}] Desdobramento Educativo & Guia Passo a Passo: transformar a ideia central em um conteúdo de alto valor que gera salvamentos (Saves) e compartilhamentos.`,
-            headlineArte: `Tudo o que você vai encontrar nos 4 dias de Festival Iguassu Inova 2026 (Guia Rápido) 📌`,
-            legenda: `Muita gente pergunta: "Mas o que exatamente tem pra fazer lá no Festival?" 🤔\n\nPreparamos o resumo definitivo pra você aproveitar cada minuto no Itaipu Parquetec de 25 a 28 de novembro:\n\n🔹 Para a mente: Keynotes nacionais e painéis sobre ${interest.label} (${baseTitle}).\n🔹 Para a carreira e negócios: Rodadas de conexão e certificado oficial para quem busca ${goal.label.toLowerCase()}.\n🔹 Para a alma: Arte, gastronomia regional e grandes shows gratuitos à noite.\n\nE a melhor parte? Você resolve sua inscrição em 1 minuto pelo celular na Yazo Tickets (link na bio).\n\n📌 Salve este post para consultar a programação e mande para quem vai com você!\n\n#FestivalIguassuInova2026 #GuiaDoFestival #ItaipuParquetec #${persona.category}`
+            mote: `[Desdobramento Educativo & Checklist]: estrutura de alto valor sobre "${ideaText.slice(0, 45)}..." gerando salvamentos.`,
+            headlineArte: `O que você precisa saber sobre esse tema no Festival Iguassu Inova 2026 📌`,
+            legenda: `Quer aproveitar cada detalhe da programação no Itaipu Parquetec? Confira o checklist:\n\n🔹 ${ideaText}\n🔹 6 Mundos Temáticos com experiências práticas\n🔹 Rodadas de conexão e grandes shows gratuitos\n\nPassaporte gratuito disponível no app Yazo Tickets (link na bio)!\n\n#FestivalIguassuInova2026 #GuiaDoFestival #ItaipuParquetec`
           };
         }
         return {
-          mote: `[${themeLabels[weeklyTheme]}] Quebra de Objeções & Serviço: responder as principais dúvidas de ${persona.name.split("(")[0]} sobre acesso, transporte e gratuidade.`,
+          mote: `[${themeLabels[weeklyTheme]}] Quebra de Objeções & Serviço: responder as principais dúvidas sobre acesso e gratuidade.`,
           headlineArte: `3 motivos reais para você garantir seu passaporte gratuito do Festival hoje mesmo.`,
-          legenda: `Ainda em dúvida se o Festival Iguassu Inova 2026 é para você? Confira como desenhamos cada detalhe pensando na sua rotina:\n\n1. Conteúdo direto ao ponto em ${interest.label} (${baseTitle}).\n2. Acesso simplificado e estrutura completa no Itaipu Parquetec.\n3. 100% gratuito e com certificação.\n\nNão deixe para a última hora! Acesse o link da bio e baixe seu ingresso na Yazo Tickets.\n\n#FestivalIguassuInova2026 #InovacaoAberta #FozDoIguacu`
+          legenda: `Ainda em dúvida se o Festival Iguassu Inova 2026 é para você? Confira como desenhamos cada detalhe pensando na sua rotina.\n\n#FestivalIguassuInova2026 #ItaipuParquetec`
         };
       }
     },
@@ -237,6 +248,9 @@ export async function POST(req: NextRequest) {
 
     // 5. Determinar chave de API Gemini: prioriza a enviada pelo usuário na tela, ou variável de ambiente
     const geminiApiKey = userApiKey?.trim() || process.env.GEMINI_API_KEY || "";
+    if (geminiApiKey && !process.env.GEMINI_API_KEY) {
+      process.env.GEMINI_API_KEY = geminiApiKey;
+    }
 
     // Caso NÃO haja chave de API configurada, utiliza o Motor Criativo Local com ângulos distintos
     if (!geminiApiKey) {
@@ -316,28 +330,45 @@ RETORNE EXCLUSIVAMENTE UM ARRAY JSON VÁLIDO COM OS ${pitchCount} OBJETOS, SEM M
   }
 ]`;
 
-      const CANDIDATE_MODELS = ["gemini-3.8-flash", "gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-pro"];
+      const CANDIDATE_MODELS = [
+        "gemini-3.8-flash",
+        "gemini-4-argon",
+        "gemini-3.8-pro",
+        "gemini-2.0-flash-exp"
+      ];
       let response: any = null;
       let modelUsed = "";
       let lastGeminiError: any = null;
 
       for (const modelCandidate of CANDIDATE_MODELS) {
-        try {
-          console.log(`[Gemini /api/generate] Tentando modelo: ${modelCandidate}...`);
-          response = await ai.models.generateContent({
-            model: modelCandidate,
-            contents: promptSystem,
-            config: {
-              responseMimeType: "application/json"
+        for (let attempt = 1; attempt <= 2; attempt++) {
+          try {
+            console.log(`[Gemini /api/generate] Tentando modelo: ${modelCandidate} (tentativa ${attempt})...`);
+            response = await ai.models.generateContent({
+              model: modelCandidate,
+              contents: promptSystem,
+              config: {
+                responseMimeType: "application/json"
+              }
+            });
+            modelUsed = modelCandidate;
+            console.log(`[Gemini /api/generate] SUCESSO com modelo: ${modelCandidate}!`);
+            break;
+          } catch (err: any) {
+            lastGeminiError = err;
+            const errMsg = err?.message || String(err);
+            const is503 = errMsg.includes("503") || errMsg.includes("high demand") || err?.status === 503;
+            console.warn(`[Gemini /api/generate] Falha com modelo ${modelCandidate} (tentativa ${attempt}):`, errMsg);
+
+            if (is503 && attempt < 2) {
+              console.log(`[Gemini /api/generate] 503 detectado em ${modelCandidate}. Aguardando 1.5s para tentar novamente...`);
+              await new Promise((r) => setTimeout(r, 1500));
+              continue;
             }
-          });
-          modelUsed = modelCandidate;
-          console.log(`[Gemini /api/generate] Sucesso com modelo: ${modelCandidate}!`);
-          break;
-        } catch (err: any) {
-          console.warn(`[Gemini /api/generate] Falha com modelo ${modelCandidate}:`, err?.message || err);
-          lastGeminiError = err;
+            break;
+          }
         }
+        if (response) break;
       }
 
       if (!response) {

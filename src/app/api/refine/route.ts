@@ -161,6 +161,9 @@ export async function POST(req: NextRequest) {
 
     // 3. Determinar chave de API Gemini (informada pelo usuário ou variável de ambiente)
     const geminiApiKey = userApiKey?.trim() || process.env.GEMINI_API_KEY || "";
+    if (geminiApiKey && !process.env.GEMINI_API_KEY) {
+      process.env.GEMINI_API_KEY = geminiApiKey;
+    }
 
     let rewritten = null;
     let engineUsed = "local_refine";
@@ -200,27 +203,44 @@ RETORNE EXCLUSIVAMENTE UM OBJETO JSON VÁLIDO:
   "justificativaFormato": "..."
 }`;
 
-        const CANDIDATE_MODELS = ["gemini-3.8-flash", "gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-pro"];
+        const CANDIDATE_MODELS = [
+          "gemini-3.8-flash",
+          "gemini-4-argon",
+          "gemini-3.8-pro",
+          "gemini-2.0-flash-exp"
+        ];
         let response: any = null;
         let lastGeminiErr: any = null;
 
         for (const candidate of CANDIDATE_MODELS) {
-          try {
-            console.log(`[Gemini Refine] Tentando modelo: ${candidate}...`);
-            response = await ai.models.generateContent({
-              model: candidate,
-              contents: prompt,
-              config: {
-                responseMimeType: "application/json"
+          for (let attempt = 1; attempt <= 2; attempt++) {
+            try {
+              console.log(`[Gemini Refine] Tentando modelo: ${candidate} (tentativa ${attempt})...`);
+              response = await ai.models.generateContent({
+                model: candidate,
+                contents: prompt,
+                config: {
+                  responseMimeType: "application/json"
+                }
+              });
+              console.log(`[Gemini Refine] SUCESSO com modelo: ${candidate}!`);
+              engineUsed = `gemini_${candidate}`;
+              break;
+            } catch (modelErr: any) {
+              lastGeminiErr = modelErr;
+              const errMsg = modelErr?.message || String(modelErr);
+              const is503 = errMsg.includes("503") || errMsg.includes("high demand") || modelErr?.status === 503;
+              console.warn(`[Gemini Refine] Falha com modelo ${candidate} (tentativa ${attempt}):`, errMsg);
+
+              if (is503 && attempt < 2) {
+                console.log(`[Gemini Refine] 503 detectado em ${candidate}. Aguardando 1.5s para retry...`);
+                await new Promise((r) => setTimeout(r, 1500));
+                continue;
               }
-            });
-            console.log(`[Gemini Refine] Sucesso com modelo: ${candidate}!`);
-            engineUsed = `gemini_${candidate}`;
-            break;
-          } catch (modelErr: any) {
-            console.warn(`[Gemini Refine] Falha com modelo ${candidate}:`, modelErr?.message || modelErr);
-            lastGeminiErr = modelErr;
+              break;
+            }
           }
+          if (response) break;
         }
 
         if (response) {
