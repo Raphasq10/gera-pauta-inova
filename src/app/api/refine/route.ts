@@ -200,7 +200,7 @@ RETORNE EXCLUSIVAMENTE UM OBJETO JSON VÁLIDO:
   "justificativaFormato": "..."
 }`;
 
-        const CANDIDATE_MODELS = ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-pro"];
+        const CANDIDATE_MODELS = ["gemini-3.8-flash", "gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-pro"];
         let response: any = null;
         let lastGeminiErr: any = null;
 
