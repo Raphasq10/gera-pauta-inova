@@ -37,6 +37,9 @@ export function GeneratorScreen({
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [activePitchForRefine, setActivePitchForRefine] = useState<PitchContent | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [userApiKey, setUserApiKey] = useState<string>("");
+  const [showKeyInput, setShowKeyInput] = useState<boolean>(false);
+  const [activeEngine, setActiveEngine] = useState<"gemini" | "local">("local");
 
   const currentPersona = personas.find((p) => p.id === selectedPersonaId) || personas[0];
   const selectedUpdate = updates.find((u) => u.id === selectedUpdateId);
@@ -60,20 +63,21 @@ ${pitch.legenda}
     // 1. Limpar erros prévios
     setFieldErrors({});
 
-    // 2. Validação client-side com Zod para feedback instantâneo ao designer
+    // 2. Montar payload validado com Zod
     const formPayload = {
       personaId: selectedPersonaId,
       updateId: selectedUpdateId,
       channel,
       weeklyTheme,
       pitchCount: Number(pitchCount),
-      initialIdea: initialIdea.trim()
+      initialIdea: initialIdea.trim(),
+      userApiKey: userApiKey.trim() || undefined
     };
 
-    // 3. Validação no backend via API /api/briefing/validate
+    // 3. Chamar o Orquestrador de IA (/api/generate)
     setIsLoading(true);
     try {
-      const res = await fetch("/api/briefing/validate", {
+      const res = await fetch("/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formPayload)
@@ -87,54 +91,28 @@ ${pitch.legenda}
             errorsMap[err.field] = err.message;
           });
           setFieldErrors(errorsMap);
-          toast.error("Por favor, corrija os erros no formulário de briefing.");
+          toast.error("Por favor, verifique os campos do briefing.");
         } else {
-          toast.error(resData.error || "Erro ao validar briefing.");
+          toast.error(resData.error || "Erro ao gerar pautas.");
         }
         setIsLoading(false);
         return;
       }
 
-      // Validação passou com sucesso!
-      const isIdeaGiven = initialIdea.trim().length > 0;
-      const baseTitle = selectedUpdate ? selectedUpdate.title : "Novidades do Festival 2026";
-
-      const themeLabels: Record<string, string> = {
-        "terca-futuro": "Terça do Futuro & IA",
-        "quarta-ciencia": "Quarta da Ciência & Pesquisa",
-        "quinta-b2b": "Quinta de Negócios & Conexões",
-        "sexta-lazer": "Sexta de Lazer & Shows",
-        "livre": "Grade Livre"
-      };
-
-      const generated: PitchContent[] = Array.from({ length: pitchCount }).map((_, idx) => {
-        return {
-          id: `pitch-${Date.now()}-${idx}`,
-          version: 1,
-          createdAt: new Date().toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" }),
-          personaId: currentPersona.id,
-          personaName: currentPersona.name,
-          updateTitle: selectedUpdate?.title,
-          initialIdea: isIdeaGiven ? initialIdea.trim() : undefined,
-          channel: channel,
-          mote: isIdeaGiven
-            ? `[${themeLabels[weeklyTheme]}] Desdobramento guiado da sua ideia conectada a ${currentPersona.topInterests[0]?.label || "inovação"}: transformar a curiosidade em inscrição confirmada.`
-            : `[${themeLabels[weeklyTheme]}] Conectando ${baseTitle} com a principal dor de ${currentPersona.name.split(" ")[0]} (${currentPersona.keyPain}).`,
-          headlineArte: isIdeaGiven
-            ? `"${initialIdea.trim().slice(0, 48)}..." — viva essa experiência no Festival.`
-            : `A inovação que você esperava tem data e hora marcada no Itaipu Parquetec.`,
-          legenda: `De 25 a 28 de novembro de 2026, o maior encontro de inovação da Tríplice Fronteira reúne o que há de mais vibrante em ciência, negócios e cultura! ✨\n\nPara quem busca ${currentPersona.topGoals[0]?.label.toLowerCase() || "crescimento"}, o festival é 100% gratuito e aberto para todos.\n\nGaranta seu passaporte digital gratuito no aplicativo Yazo Tickets pelo link da bio e venha viver essa experiência completa!\n\n#FestivalIguassuInova2026 #ItaipuParquetec #${currentPersona.category}`,
-          formato: currentPersona.suggestedFormats[idx % currentPersona.suggestedFormats.length] || "Carrossel de 4 Telas",
-          justificativaFormato: `Formato escolhido com base nas métricas reais da persona: ${currentPersona.topInterests[0]?.pct}% dos ${currentPersona.count} inscritos adultos deste segmento priorizam ${currentPersona.topInterests[0]?.label} e ${currentPersona.transport[0]?.pct}% utilizam ${currentPersona.transport[0]?.label}. Canal: ${channel.toUpperCase()} (${themeLabels[weeklyTheme]}).`
-        };
-      });
-
-      onNewPitchesGenerated(generated);
+      // 4. Receber pautas formatadas da API (seja Gemini em nuvem ou Motor Offline com dados reais)
+      const generatedPitches: PitchContent[] = resData.pitches;
+      setActiveEngine(resData.source === "gemini_api" ? "gemini" : "local");
+      onNewPitchesGenerated(generatedPitches);
       setIsLoading(false);
-      toast.success(`${generated.length} pauta(s) gerada(s) com sucesso no ${isIdeaGiven ? "Modo Guiado" : "Modo Automático"}!`);
+
+      if (resData.source === "gemini_api") {
+        toast.success(`${generatedPitches.length} pauta(s) gerada(s) via Google Gemini 2.5 Flash!`);
+      } else {
+        toast.info(resData.message || `${generatedPitches.length} pauta(s) gerada(s) via Motor Local com dados reais de 2026!`);
+      }
     } catch (err: any) {
       console.error(err);
-      toast.error("Erro ao processar briefing no servidor.");
+      toast.error("Falha ao comunicar com o servidor de IA.");
       setIsLoading(false);
     }
   };
@@ -181,15 +159,45 @@ ${pitch.legenda}
                 Configure os parâmetros de audiência e a linha editorial ou insira uma ideia inicial para a IA desenvolver.
               </CardDescription>
             </div>
-            <div className="flex items-center gap-2">
-              <Badge variant="outline" className="text-emerald-400 border-emerald-500/30 bg-emerald-500/10 text-xs py-1">
-                Base 2026: 7.065 Adultos
+            <div className="flex flex-wrap items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowKeyInput(!showKeyInput)}
+                className="h-7 text-xs border-slate-700 bg-slate-950 text-slate-200 hover:text-white hover:border-amber-400/50"
+              >
+                ⚙️ {userApiKey ? "Chave Gemini Configurada" : "Inserir Chave Gemini"}
+              </Button>
+              <Badge variant="outline" className={activeEngine === "gemini" ? "text-purple-300 border-purple-500/40 bg-purple-500/10 text-xs py-1" : "text-emerald-400 border-emerald-500/30 bg-emerald-500/10 text-xs py-1"}>
+                {activeEngine === "gemini" ? "Motor: Google Gemini 2.5 Flash" : "Motor: Local Inteligente (Dados 2026)"}
               </Badge>
               <Badge variant="outline" className={initialIdea.trim() ? "text-amber-400 border-amber-500/30 bg-amber-500/10 text-xs py-1" : "text-blue-400 border-blue-500/30 bg-blue-500/10 text-xs py-1"}>
                 {initialIdea.trim() ? "Modo Guiado por Ideia" : "Modo Ideação Automática"}
               </Badge>
             </div>
           </div>
+
+          {/* Input expansível para Chave Gemini opcional */}
+          {showKeyInput && (
+            <div className="mt-3 p-3 bg-slate-950/90 rounded-lg border border-slate-700 text-xs space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="font-semibold text-slate-200 flex items-center gap-1.5">
+                  🔑 Google Gemini API Key (Opcional):
+                </span>
+                <span className="text-[11px] text-slate-400">
+                  Sem chave? O Motor Local Inteligente gera com os dados reais automaticamente.
+                </span>
+              </div>
+              <input
+                type="password"
+                placeholder="Cole sua API Key do Google AI Studio (ex: AIzaSy...)"
+                value={userApiKey}
+                onChange={(e) => setUserApiKey(e.target.value)}
+                maxLength={200}
+                className="w-full bg-slate-900 border border-slate-700 rounded px-3 py-1.5 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-400"
+              />
+            </div>
+          )}
         </CardHeader>
 
         <CardContent className="space-y-6 pt-6">

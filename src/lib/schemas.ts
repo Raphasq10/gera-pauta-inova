@@ -88,6 +88,21 @@ export const BriefingFormSchema = z.object({
 
 export type BriefingFormValues = z.infer<typeof BriefingFormSchema>;
 
+// Schema da Feature 4: Requisição para o Orquestrador de IA
+export const GeneratePitchesRequestSchema = z.object({
+  personaId: z.string().trim().min(1, "A persona é obrigatória."),
+  updateId: z.string().trim().default("none"),
+  channel: z.enum(["instagram", "linkedin", "whatsapp"], {
+    message: "Canal inválido."
+  }),
+  weeklyTheme: z.enum(["terca-futuro", "quarta-ciencia", "quinta-b2b", "sexta-lazer", "livre"]).default("livre"),
+  pitchCount: z.number().int().min(1).max(5),
+  initialIdea: z.string().trim().max(800).optional().or(z.literal("")),
+  userApiKey: z.string().trim().max(200).optional()
+});
+
+export type GeneratePitchesRequestValues = z.infer<typeof GeneratePitchesRequestSchema>;
+
 // Regras para upload de planilha .xlsx
 export const MAX_FILE_SIZE = 15 * 1024 * 1024; // 15 Megabytes
 export const ALLOWED_EXTENSIONS = [".xlsx", ".xls"];
