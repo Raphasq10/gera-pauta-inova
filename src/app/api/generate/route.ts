@@ -317,33 +317,51 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // 6. Chamada Real com Google Gemini Interactions API (gemini-3.8-flash / gemini-4-argon)
+    // 6. Chamada Real com Google Gemini API
     try {
+      const isPaidTraffic = /tr[aá]fego\s*pago|an[uú]ncio|ads|fomo|cta/i.test(initialIdea || "");
+
+      const briefingSection = initialIdea
+        ? `🚨 DIRETRIZ SOBERANA DO BRIEFING (PRIORIDADE MÁXIMA E ABSOLUTA):
+O conteudista definiu explicitamente o seguinte pedido de conteúdo:
+"${initialIdea}"
+
+REGRAS INEGOCIÁVEIS DESTE BRIEFING:
+1. O TEMA CENTRAL DE TODAS AS ${pitchCount} PAUTAS DEVE SER EXCLUSIVAMENTE O TEMA PEDIDO ACIMA!
+   - Se o conteudista pediu "Estudantes de Medicina trilha corpo e mente - conectar com a palestra do Drauzio", TODAS as ${pitchCount} pautas geradas DEVEM ser sobre a palestra do Dr. Drauzio Varella na Trilha Corpo & Mente para estudantes de Medicina.
+   - NUNCA mude de assunto entre as pautas! É PROIBIDO criar pautas aleatórias sobre rotas de ônibus, feiras gastronômicas ou piadas genéricas que desviem do tema central solicitado.
+   - A DIFERENCIAÇÃO ENTRE AS ${pitchCount} PAUTAS DEVE SER NO ÂNGULO PUBLICITÁRIO DENTRO DO MESMO TEMA:
+     * Pauta #1: Foco em alta performance / Gancho provocativo sobre a rotina médica e o impacto de aprender com o Dr. Drauzio Varella ao vivo.
+     * Pauta #2: Foco em Urgência, Esgotamento Mental e Exclusividade (FOMO) / Por que a Trilha Corpo & Mente é o divisor de águas na formação do futuro médico.
+     * (Se houver mais pautas): Outros ganchos focados em networking acadêmico de elite na Tríplice Fronteira ou certificado oficial.
+${isPaidTraffic ? `
+2. ORIENTAÇÃO ESPECÍFICA PARA TRÁFEGO PAGO / ANÚNCIOS (ADS):
+   - O conteudista solicitou explicitamente estrutura para TRÁFEGO PAGO / ADS com foco em FOMO ("não vai ficar de fora dessa").
+   - Escreva copies de ALTA CONVERSÃO para anúncios pagos de redes sociais:
+     * Headline / Hook: Frase curta, magnética, que interrompe o scroll do feed imediatamente.
+     * Copy da Legenda: Estrutura persuasiva e envolvente (Dor da rotina -> Solução na Trilha Corpo & Mente com Drauzio Varella -> Vantagens: 100% gratuito, Itaipu Parquetec, certificado oficial).
+     * Call to Action (CTA): Finalize OBRIGATORIAMENTE com uma chamada urgente para conversão: "Não vai ficar de fora dessa! Os passaportes gratuitos são limitados. Baixe agora o app Yazo Tickets e garanta sua vaga antes que esgote."
+     * Formato: Utilize formatos próprios de anúncios, como "Reels / Vídeo Ad (Roteiro em 3 Cenas)", "Carrossel de Anúncio Pago (Alta Conversão)" ou "Dark Post para Feed".` : ""}`
+        : `- MODO IDEAÇÃO AUTÔNOMA: Crie os melhores ângulos criativos conectando os mundos temáticos às dores da persona.`;
+
       const promptSystem = `Você é o Diretor de Criação e Copywriter Sênior Oficial do Festival Iguassu Inova 2026 (Itaipu Parquetec, Foz do Iguaçu, 25 a 28 de novembro de 2026).
-Sua missão é criar exatamente ${pitchCount} pautas de redes sociais COMPLETAMENTE DIFERENTES ENTRE SI, altamente criativas, prontas para publicação e fundamentadas nos dados reais dos inscritos adultos de 2026.
+Sua missão é criar exatamente ${pitchCount} pautas de redes sociais de nível internacional, altamente criativas, persuasivas e prontas para publicação imediata.
 
-DADOS REAIS DA PERSONA:
-- Nome/Perfil: ${persona.name} (${persona.role})
-- Volume Adulto na Base: ${persona.count} inscritos (${persona.pctOfAdults}% dos adultos do festival)
-- Dor Principal: ${persona.keyPain}
-- Tom de Voz Obrigatório: ${persona.tone}
-- Top Interesses Reais: ${persona.topInterests?.map((i: any) => `${i.label} (${i.pct}%)`).join(", ")}
-- Top Objetivos: ${persona.topGoals?.map((g: any) => `${g.label} (${g.pct}%)`).join(", ")}
-- Transporte Principal: ${persona.transport?.[0]?.label} (${persona.transport?.[0]?.pct}%)
-- Formatos sugeridos da persona: ${persona.suggestedFormats?.join(", ")}
+${briefingSection}
 
-CONTEXTO DO FESTIVAL:
-- Foco Selecionado: ${updateFound ? `${updateFound.title} [${updateFound.world}] - ${updateFound.summary}` : "Visão Geral do Festival (6 Mundos Temáticos, 4 Shows Nacionais como Emicida e Duda Beat, Palestrantes Nacionais, Feira Gastronômica, 100% gratuito)"}
-- Canal de Distribuição: ${channel.toUpperCase()}
-- Linha Editorial da Grade: ${weeklyTheme}
-${initialIdea ? `- BRIEFING / IDEIA INICIAL DO CONTEUDISTA: "${initialIdea}"\n  IMPORTANTE: NÃO copie nem recorte literalmente a frase do conteudista na headline! Interprete o pedido dele como um Diretor Criativo faria e crie ganchos publicitários magnéticos, naturais e criativos que desenvolvam essa ideia.` : "- MODO IDEAÇÃO AUTÔNOMA: Crie os melhores ângulos criativos do zero."}
+DADOS DA PERSONA PARA EMBASAMENTO (Use para quebrar objeções e conectar com o público):
+- Perfil: ${persona.name} (${persona.role})
+- Volume: ${persona.count} inscritos adultos (${persona.pctOfAdults}% da base do festival)
+- Interesses: ${persona.topInterests?.map((i: any) => `${i.label} (${i.pct}%)`).join(", ")}
+- Objetivos: ${persona.topGoals?.map((g: any) => `${g.label} (${g.pct}%)`).join(", ")}
+- Tom de Voz: Inteligente, dinâmico, jovem, respeitoso e instigante.
 
-REGRAS OBRIGATÓRIAS DE DIFERENCIAÇÃO E QUALIDADE:
-1. Cada uma das ${pitchCount} pautas DEVE ter uma abordagem diferente (ex: Pauta 1 focada em convite social/amigos ou humor; Pauta 2 focada em roteiro prático/carrossel/serviço; Pauta 3 focada em curiosidade/ROV, etc.). NUNCA gere duas pautas parecidas.
-2. Mote do conteúdo: Explique o conceito criativo da peça e como ele resolve a dor da persona e atende ao briefing.
-3. Headline (O que vai na arte): Crie uma frase de capa/arte digna de agência premiada — curta, magnética, sem parecer rascunho.
-4. Legenda para redes: Texto completo, envolvente, com formatação escaneável (emojis, tópicos), quebrando objeções (100% gratuito, passaporte no app Yazo Tickets, certificado oficial, estrutura no Itaipu Parquetec), CTA forte e hashtags.
-5. Formato + Justificativa com Dados: Indique um formato específico e justifique citando os percentuais reais da persona fornecidos acima.
+DIRETRIZES INSTITUCIONAIS OBRIGATÓRIAS:
+1. O Festival Iguassu Inova é uma realização oficial do ITAIPU PARQUETEC e da ITAIPU BINACIONAL.
+2. É ESTRITAMENTE PROIBIDO utilizar piadas autodepreciativas de mau gosto (ex: NUNCA use frases como "pobre só sofre", caricaturas depreciativas de estudantes ou humor apelativo). O tom deve valorizar a inteligência e o futuro dos participantes.
+3. Headline (O que vai na arte/vídeo): Deve ser digna de agência premiada — limpa, instigante, sem reticências desnecessárias.
+4. Legenda: Texto completo, fluido, escaneável com emojis elegantes, quebrando objeções (100% gratuito, passaporte no app Yazo Tickets, certificado oficial) e CTA forte.
+5. Formato + Justificativa com Dados: Justifique a escolha do formato baseando-se nos objetivos da persona.
 
 RETORNE EXCLUSIVAMENTE UM ARRAY JSON VÁLIDO COM OS ${pitchCount} OBJETOS, SEM MARKDOWN ADICIONAL:
 [
