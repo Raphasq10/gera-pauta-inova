@@ -40,11 +40,24 @@ export function GeneratorScreen({
   const [activePitchForRefine, setActivePitchForRefine] = useState<PitchContent | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [userApiKey, setUserApiKey] = useState<string>("");
+  const [hasServerKey, setHasServerKey] = useState<boolean>(false);
   const [showKeyInput, setShowKeyInput] = useState<boolean>(false);
-  const [activeEngine, setActiveEngine] = useState<"gemini" | "local">("local");
+  const [activeEngine, setActiveEngine] = useState<"gemini" | "local">("gemini");
 
-  // Carrega a chave Gemini salva no navegador (localStorage) para não precisar digitar toda vez
+  // Detecta chave no servidor (Vercel) ou salva no navegador (localStorage)
   React.useEffect(() => {
+    // 1. Checa se o servidor já possui a variável de ambiente configurada
+    fetch("/api/config")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && data.hasServerKey) {
+          setHasServerKey(true);
+          setActiveEngine("gemini");
+        }
+      })
+      .catch(() => {});
+
+    // 2. Carrega chave salva localmente caso o usuário tenha inserido
     try {
       const savedKey = localStorage.getItem("inova_gemini_api_key");
       if (savedKey) {
@@ -190,31 +203,31 @@ ${pitch.legenda}
                 variant="outline"
                 size="sm"
                 onClick={() => setShowKeyInput(!showKeyInput)}
-                className={userApiKey.trim() ? "h-8 text-xs border-emerald-500/50 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20 font-semibold cursor-pointer" : "h-8 text-xs border-amber-500/60 bg-amber-500/10 text-amber-300 hover:bg-amber-500/20 font-semibold cursor-pointer"}
+                className={(hasServerKey || userApiKey.trim()) ? "h-8 text-xs border-emerald-500/50 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20 font-semibold cursor-pointer" : "h-8 text-xs border-amber-500/60 bg-amber-500/10 text-amber-300 hover:bg-amber-500/20 font-semibold cursor-pointer"}
               >
-                🔑 {userApiKey.trim() ? "IA Gemini Conectada (Alterar Chave)" : "Conectar Chave Gemini (Google AI Studio)"}
+                🔑 {(hasServerKey || userApiKey.trim()) ? "IA Gemini Conectada" : "Conectar Chave Gemini"}
               </Button>
-              <Badge variant="outline" className={userApiKey.trim() ? "text-purple-300 border-purple-500/40 bg-purple-500/10 text-xs py-1 font-semibold" : "text-emerald-300 border-emerald-500/30 bg-emerald-500/10 text-xs py-1"}>
-                {userApiKey.trim() ? "⚡ Gemini 2.5 Flash Ativo" : "🧠 Motor Criativo Local Ativo"}
+              <Badge variant="outline" className={(hasServerKey || userApiKey.trim()) ? "text-emerald-300 border-emerald-500/40 bg-emerald-500/10 text-xs py-1 font-semibold" : "text-amber-300 border-amber-500/30 bg-amber-500/10 text-xs py-1"}>
+                {(hasServerKey || userApiKey.trim()) ? "⚡ IA Gemini Conectada (Nuvem)" : "🧠 Motor Criativo Local"}
               </Badge>
             </div>
           </div>
 
-          {/* Input expansível ou aviso de Chave Gemini */}
-          {(showKeyInput || !userApiKey.trim()) && (
+          {/* Input expansível caso o usuário queira trocar a chave manualmente */}
+          {(showKeyInput || (!hasServerKey && !userApiKey.trim())) && (
             <div className="mt-3 p-3.5 bg-slate-950 rounded-xl border border-amber-500/30 text-xs space-y-2">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <span className="font-bold text-amber-300 flex items-center gap-1.5">
-                  🔑 Conectar ao Google Gemini 2.5 Flash (Chave da sua aba aberta do Google AI Studio):
+                  🔑 Chave API Google AI Studio {hasServerKey ? "(Já ativa no servidor Vercel)" : "(Necessária para chamada em nuvem)"}:
                 </span>
                 <span className="text-[11px] text-slate-300">
-                  A chave fica salva no seu navegador com segurança.
+                  {hasServerKey ? "Sua chave já está configurada na Vercel! Você pode alterá-la aqui se desejar." : "Cole sua chave gratuita do Google AI Studio para usar a IA."}
                 </span>
               </div>
               <div className="flex gap-2">
                 <input
                   type="password"
-                  placeholder="Cole aqui sua chave API do Google AI Studio (começa com AIzaSy...)"
+                  placeholder={hasServerKey ? "•••••••••••••••••••••••• (Chave Vercel Ativa)" : "Cole aqui sua chave API do Google AI Studio (começa com AIzaSy...)"}
                   value={userApiKey}
                   onChange={(e) => handleSaveApiKey(e.target.value)}
                   maxLength={200}
