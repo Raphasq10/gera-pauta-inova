@@ -16,9 +16,15 @@ export default function Home() {
   const [updates, setUpdates] = useState<FestivalUpdate[]>(INITIAL_UPDATES);
   const [pitches, setPitches] = useState<PitchContent[]>(INITIAL_PITCHES);
   const [activeTab, setActiveTab] = useState<string>("generator");
+  const [userApiKey, setUserApiKey] = useState<string>("");
 
-  // Carrega pautas persistidas no banco local ao abrir o aplicativo
+  // Carrega chave salva e pautas persistidas no banco local ao abrir o aplicativo
   React.useEffect(() => {
+    if (typeof window !== "undefined") {
+      const savedKey = localStorage.getItem("inova_gemini_api_key") || localStorage.getItem("inova_pauta_gemini_key") || "";
+      if (savedKey) setUserApiKey(savedKey);
+    }
+
     async function loadPitches() {
       try {
         const res = await fetch("/api/pitches");
@@ -167,6 +173,7 @@ export default function Home() {
               personas={personas}
               onUpdatePitch={handleUpdatePitch}
               onDeletePitch={handleDeletePitch}
+              userApiKey={userApiKey}
             />
           </TabsContent>
 

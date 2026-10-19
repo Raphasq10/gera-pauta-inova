@@ -16,9 +16,10 @@ interface HistoryScreenProps {
   personas: PersonaData[];
   onUpdatePitch: (pitchId: string, updatedPitch: Partial<PitchContent>) => void;
   onDeletePitch?: (pitchId: string) => void;
+  userApiKey?: string;
 }
 
-export function HistoryScreen({ pitches, personas, onUpdatePitch, onDeletePitch }: HistoryScreenProps) {
+export function HistoryScreen({ pitches, personas, onUpdatePitch, onDeletePitch, userApiKey }: HistoryScreenProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterPersona, setFilterPersona] = useState<string>("all");
   const [activePitchForRefine, setActivePitchForRefine] = useState<PitchContent | null>(null);
@@ -265,6 +266,7 @@ ${pitch.legenda}
         isOpen={!!activePitchForRefine}
         onClose={() => setActivePitchForRefine(null)}
         onApplyRefine={handleApplyRefine}
+        userApiKey={userApiKey}
       />
     </div>
   );

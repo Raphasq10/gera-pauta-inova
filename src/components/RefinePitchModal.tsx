@@ -30,6 +30,13 @@ export function RefinePitchModal({ pitch, isOpen, onClose, onApplyRefine, userAp
     setIsSubmitting(true);
     setErrorMessage(null);
 
+    const effectiveKey =
+      userApiKey?.trim() ||
+      (typeof window !== "undefined"
+        ? localStorage.getItem("inova_gemini_api_key")?.trim() || localStorage.getItem("inova_pauta_gemini_key")?.trim()
+        : "") ||
+      undefined;
+
     try {
       const res = await fetch("/api/refine", {
         method: "POST",
@@ -39,7 +46,7 @@ export function RefinePitchModal({ pitch, isOpen, onClose, onApplyRefine, userAp
           instruction: instruction.trim(),
           format: selectedFormat,
           tone: selectedTone,
-          userApiKey: userApiKey?.trim() || undefined
+          userApiKey: effectiveKey
         })
       });
 

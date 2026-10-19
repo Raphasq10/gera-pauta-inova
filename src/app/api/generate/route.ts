@@ -246,10 +246,38 @@ export async function POST(req: NextRequest) {
       updateFound = updates.find((u: any) => u.id === updateId);
     }
 
-    // 5. Determinar chave de API Gemini: prioriza a enviada pelo usuário na tela, ou variável de ambiente
-    const geminiApiKey = userApiKey?.trim() || process.env.GEMINI_API_KEY || "";
-    if (geminiApiKey && !process.env.GEMINI_API_KEY) {
-      process.env.GEMINI_API_KEY = geminiApiKey;
+    // 5. Determinar chave de API Gemini: prioriza a enviada pelo usuário na tela, variável de ambiente ou .env.local
+    let geminiApiKey = userApiKey?.trim() || process.env.GEMINI_API_KEY || "";
+    if (!geminiApiKey) {
+      try {
+        const envPath = path.join(process.cwd(), ".env.local");
+        if (fs.existsSync(envPath)) {
+          const envContent = fs.readFileSync(envPath, "utf-8");
+          const match = envContent.match(/GEMINI_API_KEY=["']?([^"'\r\n]+)["']?/);
+          if (match && match[1] && match[1].trim()) {
+            geminiApiKey = match[1].trim();
+            process.env.GEMINI_API_KEY = geminiApiKey;
+          }
+        }
+      } catch {
+        // safe ignore
+      }
+    } else {
+      if (!process.env.GEMINI_API_KEY) {
+        process.env.GEMINI_API_KEY = geminiApiKey;
+      }
+      try {
+        const envPath = path.join(process.cwd(), ".env.local");
+        if (fs.existsSync(envPath)) {
+          let envContent = fs.readFileSync(envPath, "utf-8");
+          if (!envContent.includes(geminiApiKey)) {
+            envContent = envContent.replace(/GEMINI_API_KEY=.*/g, `GEMINI_API_KEY="${geminiApiKey}"`);
+            fs.writeFileSync(envPath, envContent, "utf-8");
+          }
+        }
+      } catch {
+        // safe ignore
+      }
     }
 
     // Caso NÃO haja chave de API configurada, utiliza o Motor Criativo Local com ângulos distintos

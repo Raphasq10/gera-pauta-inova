@@ -68,7 +68,7 @@ function smartLocalRewrite(
       specificHeadline = `${capTheme}: confira todos os detalhes no Festival Iguassu Inova 2026! 🚀`;
     }
 
-    const specificMote = `Atendimento Direto ao Briefing (v${nextVersion}): pauta focada na instrução do conteudista ("${rawInstr}"), conectando com os estudantes e profissionais de ${currentPitch.personaName.split("(")[0].trim()}.`;
+    const specificMote = `Atendimento Direto ao Briefing (v${nextVersion}): pauta adaptada criativamente para a solicitação do conteudista ("${rawInstr}"), conectando os temas de relevância com a persona ${currentPitch.personaName.split("(")[0].trim()}.`;
 
     let formatIntro = "";
     if (finalFormat.toLowerCase().includes("reels")) {
@@ -77,14 +77,23 @@ function smartLocalRewrite(
       formatIntro = `📚 ESTRUTURA DO CARROSSEL:\n• Lâmina 1 (Capa): ${specificHeadline}\n• Lâmina 2: O que torna esse encontro imperdível para a nossa região.\n• Lâmina 3: Como a imersão agrega na sua formação acadêmica e horas complementares.\n• Lâmina 4: Serviço completo (data, local e como retirar seu passaporte grátis).\n\n📌 LEGENDA:\n`;
     }
 
-    const specificLegenda = `${formatIntro}Uma oportunidade imperdível para quem estuda e respira conhecimento na nossa fronteira! 🌟\n\n${rawInstr}.\n\nDe 25 a 28 de novembro, o Itaipu Parquetec se transforma no epicentro da inovação, reunindo grandes referências nacionais, debates essenciais e mais de 6 Mundos Temáticos com entrada 100% gratuita.\n\n📍 Local: Itaipu Parquetec (Foz do Iguaçu - PR)\n📅 Data: 25 a 28 de Novembro de 2026\n🎟️ Passaporte: Gratuito no app Yazo Tickets (link na bio)\n🎓 Certificado oficial de participação\n\nMarque aqui seus colegas de curso e garanta seu lugar antecipado!\n\n#FestivalIguassuInova2026 #MedicinaFronteira #ItaipuParquetec #FozDoIguaçu`;
+    let thematicBody = "";
+    if (isDrauzio && isParaguai) {
+      thematicBody = "Seja você estudante de medicina em Foz do Iguaçu, Ciudad del Este ou de qualquer canto da região trinacional: essa é a sua chance de aprender de perto com um dos médicos mais respeitados da história do Brasil.";
+    } else if (isDrauzio) {
+      thematicBody = "Uma aula magna de ética, empatia e divulgação científica com quem dedicou mais de cinco décadas a cuidar de pessoas e transformar a saúde pública no Brasil.";
+    } else {
+      thematicBody = "Uma experiência imersiva feita sob medida para expandir seu repertório acadêmico, fazer networking qualificado e se conectar com as grandes mentes da inovação.";
+    }
+
+    const specificLegenda = `${formatIntro}Uma oportunidade imperdível para quem estuda e respira conhecimento na nossa fronteira! 🌟\n\n${thematicBody}\n\nDe 25 a 28 de novembro, o Itaipu Parquetec se transforma no epicentro da inovação, reunindo grandes referências nacionais, debates essenciais e mais de 6 Mundos Temáticos com entrada 100% gratuita.\n\n📍 Local: Itaipu Parquetec (Foz do Iguaçu - PR)\n📅 Data: 25 a 28 de Novembro de 2026\n🎟️ Passaporte: Gratuito no app Yazo Tickets (link na bio)\n🎓 Certificado oficial de participação\n\nMarque aqui seus colegas de curso e garanta seu lugar antecipado!\n\n#FestivalIguassuInova2026 #MedicinaFronteira #ItaipuParquetec #FozDoIguaçu`;
 
     return {
       mote: specificMote,
       headlineArte: specificHeadline,
       legenda: specificLegenda,
       formato: finalFormat,
-      justificativaFormato: `Formato "${finalFormat}" adaptado diretamente para a instrução: "${rawInstr}". O gancho dialoga com a formação acadêmica e a integração regional.`
+      justificativaFormato: `Formato "${finalFormat}" adaptado diretamente para a diretriz: "${rawInstr}". O gancho dialoga com a formação acadêmica e a integração regional.`
     };
   }
 
@@ -159,10 +168,38 @@ export async function POST(req: NextRequest) {
         : currentPitch.formato;
     const targetTone = tone && tone !== "manter" ? tone : "padrão da persona";
 
-    // 3. Determinar chave de API Gemini (informada pelo usuário ou variável de ambiente)
-    const geminiApiKey = userApiKey?.trim() || process.env.GEMINI_API_KEY || "";
-    if (geminiApiKey && !process.env.GEMINI_API_KEY) {
-      process.env.GEMINI_API_KEY = geminiApiKey;
+    // 3. Determinar chave de API Gemini (informada pelo usuário, variável de ambiente ou .env.local)
+    let geminiApiKey = userApiKey?.trim() || process.env.GEMINI_API_KEY || "";
+    if (!geminiApiKey) {
+      try {
+        const envPath = path.join(process.cwd(), ".env.local");
+        if (fs.existsSync(envPath)) {
+          const envContent = fs.readFileSync(envPath, "utf-8");
+          const match = envContent.match(/GEMINI_API_KEY=["']?([^"'\r\n]+)["']?/);
+          if (match && match[1] && match[1].trim()) {
+            geminiApiKey = match[1].trim();
+            process.env.GEMINI_API_KEY = geminiApiKey;
+          }
+        }
+      } catch {
+        // safe ignore
+      }
+    } else {
+      if (!process.env.GEMINI_API_KEY) {
+        process.env.GEMINI_API_KEY = geminiApiKey;
+      }
+      try {
+        const envPath = path.join(process.cwd(), ".env.local");
+        if (fs.existsSync(envPath)) {
+          let envContent = fs.readFileSync(envPath, "utf-8");
+          if (!envContent.includes(geminiApiKey)) {
+            envContent = envContent.replace(/GEMINI_API_KEY=.*/g, `GEMINI_API_KEY="${geminiApiKey}"`);
+            fs.writeFileSync(envPath, envContent, "utf-8");
+          }
+        }
+      } catch {
+        // safe ignore
+      }
     }
 
     let rewritten = null;
