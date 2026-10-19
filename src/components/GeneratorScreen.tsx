@@ -30,8 +30,10 @@ export function GeneratorScreen({
   const [selectedPersonaId, setSelectedPersonaId] = useState<string>(personas[0]?.id || "p2");
   const [selectedUpdateId, setSelectedUpdateId] = useState<string>("none");
   const [channel, setChannel] = useState<"instagram" | "linkedin" | "whatsapp">("instagram");
+  const [weeklyTheme, setWeeklyTheme] = useState<"terca-futuro" | "quarta-ciencia" | "quinta-b2b" | "sexta-lazer" | "livre">("livre");
   const [pitchCount, setPitchCount] = useState<number>(2);
   const [initialIdea, setInitialIdea] = useState<string>("");
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [activePitchForRefine, setActivePitchForRefine] = useState<PitchContent | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -54,14 +56,58 @@ ${pitch.legenda}
     setTimeout(() => setCopiedId(null), 2000);
   };
 
-  const handleGenerate = () => {
+  const handleGenerate = async () => {
+    // 1. Limpar erros prévios
+    setFieldErrors({});
+
+    // 2. Validação client-side com Zod para feedback instantâneo ao designer
+    const formPayload = {
+      personaId: selectedPersonaId,
+      updateId: selectedUpdateId,
+      channel,
+      weeklyTheme,
+      pitchCount: Number(pitchCount),
+      initialIdea: initialIdea.trim()
+    };
+
+    // 3. Validação no backend via API /api/briefing/validate
     setIsLoading(true);
-    // Simulação de resposta com dados reais e estrutura obrigatória
-    setTimeout(() => {
+    try {
+      const res = await fetch("/api/briefing/validate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formPayload)
+      });
+
+      const resData = await res.json();
+      if (!res.ok || !resData.success) {
+        if (resData.details) {
+          const errorsMap: Record<string, string> = {};
+          resData.details.forEach((err: { field: string; message: string }) => {
+            errorsMap[err.field] = err.message;
+          });
+          setFieldErrors(errorsMap);
+          toast.error("Por favor, corrija os erros no formulário de briefing.");
+        } else {
+          toast.error(resData.error || "Erro ao validar briefing.");
+        }
+        setIsLoading(false);
+        return;
+      }
+
+      // Validação passou com sucesso!
+      const isIdeaGiven = initialIdea.trim().length > 0;
+      const baseTitle = selectedUpdate ? selectedUpdate.title : "Novidades do Festival 2026";
+
+      const themeLabels: Record<string, string> = {
+        "terca-futuro": "Terça do Futuro & IA",
+        "quarta-ciencia": "Quarta da Ciência & Pesquisa",
+        "quinta-b2b": "Quinta de Negócios & Conexões",
+        "sexta-lazer": "Sexta de Lazer & Shows",
+        "livre": "Grade Livre"
+      };
+
       const generated: PitchContent[] = Array.from({ length: pitchCount }).map((_, idx) => {
-        const isIdeaGiven = initialIdea.trim().length > 0;
-        const baseTitle = selectedUpdate ? selectedUpdate.title : "Novidades do Festival 2026";
-        
         return {
           id: `pitch-${Date.now()}-${idx}`,
           version: 1,
@@ -69,24 +115,28 @@ ${pitch.legenda}
           personaId: currentPersona.id,
           personaName: currentPersona.name,
           updateTitle: selectedUpdate?.title,
-          initialIdea: isIdeaGiven ? initialIdea : undefined,
+          initialIdea: isIdeaGiven ? initialIdea.trim() : undefined,
           channel: channel,
           mote: isIdeaGiven
-            ? `Desdobramento criativo da sua ideia conectada a ${currentPersona.topInterests[0].label}: transformar a curiosidade em inscrição confirmada.`
-            : `Conectando ${baseTitle} com a principal dor de ${currentPersona.name.split(" ")[0]} (${currentPersona.keyPain}).`,
+            ? `[${themeLabels[weeklyTheme]}] Desdobramento guiado da sua ideia conectada a ${currentPersona.topInterests[0]?.label || "inovação"}: transformar a curiosidade em inscrição confirmada.`
+            : `[${themeLabels[weeklyTheme]}] Conectando ${baseTitle} com a principal dor de ${currentPersona.name.split(" ")[0]} (${currentPersona.keyPain}).`,
           headlineArte: isIdeaGiven
-            ? `"${initialIdea.slice(0, 48)}..." — o festival que você não pode perder.`
+            ? `"${initialIdea.trim().slice(0, 48)}..." — viva essa experiência no Festival.`
             : `A inovação que você esperava tem data e hora marcada no Itaipu Parquetec.`,
-          legenda: `De 25 a 28 de novembro de 2026, o maior encontro de inovação da Tríplice Fronteira reúne o que há de mais vibrante em ciência, negócios e cultura! ✨\n\nPara quem busca ${currentPersona.topGoals[0].label.toLowerCase()}, o festival é 100% gratuito e aberto para todos.\n\nGaranta seu passaporte digital gratuito no aplicativo Yazo Tickets pelo link da bio e venha viver essa experiência completa!\n\n#FestivalIguassuInova2026 #ItaipuParquetec #${currentPersona.category}`,
+          legenda: `De 25 a 28 de novembro de 2026, o maior encontro de inovação da Tríplice Fronteira reúne o que há de mais vibrante em ciência, negócios e cultura! ✨\n\nPara quem busca ${currentPersona.topGoals[0]?.label.toLowerCase() || "crescimento"}, o festival é 100% gratuito e aberto para todos.\n\nGaranta seu passaporte digital gratuito no aplicativo Yazo Tickets pelo link da bio e venha viver essa experiência completa!\n\n#FestivalIguassuInova2026 #ItaipuParquetec #${currentPersona.category}`,
           formato: currentPersona.suggestedFormats[idx % currentPersona.suggestedFormats.length] || "Carrossel de 4 Telas",
-          justificativaFormato: `Formato escolhido com base nas métricas reais da persona: ${currentPersona.topInterests[0].pct}% dos ${currentPersona.count} inscritos adultos deste segmento priorizam ${currentPersona.topInterests[0].label} e ${currentPersona.transport[0].pct}% utilizam ${currentPersona.transport[0].label}.`
+          justificativaFormato: `Formato escolhido com base nas métricas reais da persona: ${currentPersona.topInterests[0]?.pct}% dos ${currentPersona.count} inscritos adultos deste segmento priorizam ${currentPersona.topInterests[0]?.label} e ${currentPersona.transport[0]?.pct}% utilizam ${currentPersona.transport[0]?.label}. Canal: ${channel.toUpperCase()} (${themeLabels[weeklyTheme]}).`
         };
       });
 
       onNewPitchesGenerated(generated);
       setIsLoading(false);
-      toast.success(`${generated.length} pauta(s) gerada(s) e salvas no histórico!`);
-    }, 1200);
+      toast.success(`${generated.length} pauta(s) gerada(s) com sucesso no ${isIdeaGiven ? "Modo Guiado" : "Modo Automático"}!`);
+    } catch (err: any) {
+      console.error(err);
+      toast.error("Erro ao processar briefing no servidor.");
+      setIsLoading(false);
+    }
   };
 
   const handleApplyRefine = (pitchId: string, instruction: string, newFormat?: string, newTone?: string) => {
@@ -125,25 +175,30 @@ ${pitch.legenda}
             <div>
               <CardTitle className="text-xl font-bold text-white flex items-center gap-2">
                 <Sparkles className="w-5 h-5 text-amber-400" />
-                Gerador de Pautas com Inteligência Artificial
+                Painel de Briefing & Gerador de Pautas
               </CardTitle>
               <CardDescription className="text-slate-400 text-xs mt-1">
-                Gere conteúdos com base nos dados reais dos inscritos de 2026, pessoas mapeadas e atrações oficiais.
+                Configure os parâmetros de audiência e a linha editorial ou insira uma ideia inicial para a IA desenvolver.
               </CardDescription>
             </div>
-            <Badge variant="outline" className="text-emerald-400 border-emerald-500/30 bg-emerald-500/10 text-xs py-1">
-              Base 2026: 7.065 Adultos (Sem Menores)
-            </Badge>
+            <div className="flex items-center gap-2">
+              <Badge variant="outline" className="text-emerald-400 border-emerald-500/30 bg-emerald-500/10 text-xs py-1">
+                Base 2026: 7.065 Adultos
+              </Badge>
+              <Badge variant="outline" className={initialIdea.trim() ? "text-amber-400 border-amber-500/30 bg-amber-500/10 text-xs py-1" : "text-blue-400 border-blue-500/30 bg-blue-500/10 text-xs py-1"}>
+                {initialIdea.trim() ? "Modo Guiado por Ideia" : "Modo Ideação Automática"}
+              </Badge>
+            </div>
           </div>
         </CardHeader>
 
         <CardContent className="space-y-6 pt-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            {/* Seletor de Persona */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            {/* 1. Seletor de Persona */}
             <div>
               <label htmlFor="select-persona" className="block text-xs font-semibold text-slate-300 mb-1.5 flex items-center gap-1.5">
                 <Users className="w-3.5 h-3.5 text-blue-400" />
-                1. Persona-Alvo do Festival *
+                1. Persona-Alvo *
               </label>
               <Select value={selectedPersonaId} onValueChange={(val) => val && setSelectedPersonaId(val)}>
                 <SelectTrigger id="select-persona" className="bg-slate-950 border-slate-700 text-slate-100 text-xs">
@@ -157,9 +212,12 @@ ${pitch.legenda}
                   ))}
                 </SelectContent>
               </Select>
+              {fieldErrors.personaId && (
+                <span className="text-[11px] text-rose-400 mt-1 block">{fieldErrors.personaId}</span>
+              )}
             </div>
 
-            {/* Seletor de Atualização / Foco do Festival */}
+            {/* 2. Seletor de Atualização / Foco do Festival */}
             <div>
               <label htmlFor="select-update" className="block text-xs font-semibold text-slate-300 mb-1.5 flex items-center gap-1.5">
                 <Layers className="w-3.5 h-3.5 text-amber-400" />
@@ -167,7 +225,7 @@ ${pitch.legenda}
               </label>
               <Select value={selectedUpdateId} onValueChange={(val) => val && setSelectedUpdateId(val)}>
                 <SelectTrigger id="select-update" className="bg-slate-950 border-slate-700 text-slate-100 text-xs">
-                  <SelectValue placeholder="Sem atração específica" />
+                  <SelectValue placeholder="Geral do Festival" />
                 </SelectTrigger>
                 <SelectContent className="bg-slate-900 border-slate-700 text-slate-100 text-xs">
                   <SelectItem value="none">Geral do Festival (Sem atração específica)</SelectItem>
@@ -180,33 +238,51 @@ ${pitch.legenda}
               </Select>
             </div>
 
-            {/* Canal e Quantidade */}
-            <div className="grid grid-cols-2 gap-3">
+            {/* 3. Canal de Destino */}
+            <div>
+              <label className="block text-xs font-semibold text-slate-300 mb-1.5">3. Canal de Destino</label>
+              <Select value={channel} onValueChange={(val: any) => val && setChannel(val)}>
+                <SelectTrigger className="bg-slate-950 border-slate-700 text-slate-100 text-xs">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-slate-900 border-slate-700 text-slate-100 text-xs">
+                  <SelectItem value="instagram">Instagram (@festivaliguassuinova)</SelectItem>
+                  <SelectItem value="linkedin">LinkedIn (Itaipu Parquetec B2B)</SelectItem>
+                  <SelectItem value="whatsapp">WhatsApp / E-mail</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* 4. Grade Semanal & Qtd */}
+            <div className="grid grid-cols-2 gap-2">
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">Canal de Destino</label>
-                <Select value={channel} onValueChange={(val: any) => val && setChannel(val)}>
+                <label className="block text-xs font-semibold text-slate-300 mb-1.5">Linha Editorial</label>
+                <Select value={weeklyTheme} onValueChange={(val: any) => val && setWeeklyTheme(val)}>
                   <SelectTrigger className="bg-slate-950 border-slate-700 text-slate-100 text-xs">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className="bg-slate-900 border-slate-700 text-slate-100 text-xs">
-                    <SelectItem value="instagram">Instagram do Festival</SelectItem>
-                    <SelectItem value="linkedin">LinkedIn Parquetec (B2B)</SelectItem>
-                    <SelectItem value="whatsapp">WhatsApp / E-mail</SelectItem>
+                    <SelectItem value="livre">Tema Livre</SelectItem>
+                    <SelectItem value="terca-futuro">Terça IA/Futuro</SelectItem>
+                    <SelectItem value="quarta-ciencia">Quarta Ciência</SelectItem>
+                    <SelectItem value="quinta-b2b">Quinta Negócios</SelectItem>
+                    <SelectItem value="sexta-lazer">Sexta Shows</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">Quantidade</label>
+                <label className="block text-xs font-semibold text-slate-300 mb-1.5">Qtd Pautas</label>
                 <Select value={pitchCount.toString()} onValueChange={(v) => v && setPitchCount(parseInt(v))}>
                   <SelectTrigger className="bg-slate-950 border-slate-700 text-slate-100 text-xs">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className="bg-slate-900 border-slate-700 text-slate-100 text-xs">
-                    <SelectItem value="1">1 Opção</SelectItem>
-                    <SelectItem value="2">2 Opções</SelectItem>
-                    <SelectItem value="3">3 Opções</SelectItem>
-                    <SelectItem value="4">4 Opções</SelectItem>
+                    <SelectItem value="1">1 Pauta</SelectItem>
+                    <SelectItem value="2">2 Pautas</SelectItem>
+                    <SelectItem value="3">3 Pautas</SelectItem>
+                    <SelectItem value="4">4 Pautas</SelectItem>
+                    <SelectItem value="5">5 Pautas</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -247,7 +323,7 @@ ${pitch.legenda}
                 💡 Ideia Inicial / Briefing do Conteudista (Opcional)
               </label>
               <span className="text-[11px] text-slate-400">
-                {initialIdea ? "Modo Guiado pela sua ideia" : "Deixe em branco para ideação 100% automática"}
+                {initialIdea.trim() ? "✨ A IA vai transformar sua ideia em pautas completas" : "🤖 Deixe em branco para ideação 100% autônoma"}
               </span>
             </div>
             <Textarea
@@ -260,8 +336,13 @@ ${pitch.legenda}
             />
             <div className="flex justify-between items-center text-[11px] text-slate-400 mt-1">
               <span>A IA vai cruzar esta ideia com as dores da persona selecionada.</span>
-              <span>{initialIdea.length}/800 caracteres</span>
+              <span className={initialIdea.length > 750 ? "text-amber-400 font-semibold" : ""}>
+                {initialIdea.length}/800 caracteres
+              </span>
             </div>
+            {fieldErrors.initialIdea && (
+              <span className="text-[11px] text-rose-400 mt-1 block">{fieldErrors.initialIdea}</span>
+            )}
           </div>
         </CardContent>
 
@@ -269,12 +350,12 @@ ${pitch.legenda}
           <Button
             onClick={handleGenerate}
             disabled={isLoading}
-            className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-bold px-6 py-2.5 shadow-lg shadow-orange-950/30 gap-2"
+            className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-bold px-6 py-2.5 shadow-lg shadow-orange-950/30 gap-2 cursor-pointer transition disabled:opacity-50"
           >
             {isLoading ? (
               <>
                 <RefreshCw className="w-4 h-4 animate-spin" />
-                Cruzando Dados e Gerando Pautas...
+                Validando Briefing e Gerando...
               </>
             ) : (
               <>

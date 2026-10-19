@@ -60,6 +60,34 @@ export const FestivalUpdateFormSchema = z.object({
 
 export type FestivalUpdateFormValues = z.infer<typeof FestivalUpdateFormSchema>;
 
+// Schema da Feature 3: Painel de Briefing e Ideia Inicial do Conteudista
+export const BriefingFormSchema = z.object({
+  personaId: z
+    .string()
+    .trim()
+    .min(1, "Selecione obrigatoriamente a persona-alvo do conteúdo."),
+  updateId: z.string().trim().default("none"),
+  channel: z.enum(["instagram", "linkedin", "whatsapp"], {
+    message: "Canal inválido selecionado."
+  }),
+  weeklyTheme: z.enum(["terca-futuro", "quarta-ciencia", "quinta-b2b", "sexta-lazer", "livre"], {
+    message: "Dia da grade semanal inválido."
+  }).default("livre"),
+  pitchCount: z
+    .number()
+    .int("A quantidade deve ser um número inteiro.")
+    .min(1, "Gere no mínimo 1 pauta.")
+    .max(5, "O limite máximo por lote é de 5 pautas."),
+  initialIdea: z
+    .string()
+    .trim()
+    .max(800, "A ideia inicial não pode ultrapassar 800 caracteres.")
+    .optional()
+    .or(z.literal(""))
+});
+
+export type BriefingFormValues = z.infer<typeof BriefingFormSchema>;
+
 // Regras para upload de planilha .xlsx
 export const MAX_FILE_SIZE = 15 * 1024 * 1024; // 15 Megabytes
 export const ALLOWED_EXTENSIONS = [".xlsx", ".xls"];
