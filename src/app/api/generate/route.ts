@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GeneratePitchesRequestSchema } from "@/lib/schemas";
-import { GoogleGenAI } from "@google/genai";
+import { callGoogleGeminiInteractions } from "@/lib/gemini";
 import fs from "fs";
 import path from "path";
 
@@ -289,10 +289,8 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // 6. Chamada Real com Google Gemini (@google/genai)
+    // 6. Chamada Real com Google Gemini Interactions API (gemini-3.8-flash / gemini-4-argon)
     try {
-      const ai = new GoogleGenAI({ apiKey: geminiApiKey });
-
       const promptSystem = `Você é o Diretor de Criação e Copywriter Sênior Oficial do Festival Iguassu Inova 2026 (Itaipu Parquetec, Foz do Iguaçu, 25 a 28 de novembro de 2026).
 Sua missão é criar exatamente ${pitchCount} pautas de redes sociais COMPLETAMENTE DIFERENTES ENTRE SI, altamente criativas, prontas para publicação e fundamentadas nos dados reais dos inscritos adultos de 2026.
 
@@ -330,58 +328,14 @@ RETORNE EXCLUSIVAMENTE UM ARRAY JSON VÁLIDO COM OS ${pitchCount} OBJETOS, SEM M
   }
 ]`;
 
-      const CANDIDATE_MODELS = [
-        "gemini-3.8-flash",
-        "gemini-4-argon",
-        "gemini-3.8-pro",
-        "gemini-2.0-flash-exp"
-      ];
-      let response: any = null;
-      let modelUsed = "";
-      let lastGeminiError: any = null;
+      const { text: responseTextRaw, model: modelUsed } = await callGoogleGeminiInteractions(geminiApiKey, promptSystem);
 
-      for (const modelCandidate of CANDIDATE_MODELS) {
-        for (let attempt = 1; attempt <= 2; attempt++) {
-          try {
-            console.log(`[Gemini /api/generate] Tentando modelo: ${modelCandidate} (tentativa ${attempt})...`);
-            response = await ai.models.generateContent({
-              model: modelCandidate,
-              contents: promptSystem,
-              config: {
-                responseMimeType: "application/json"
-              }
-            });
-            modelUsed = modelCandidate;
-            console.log(`[Gemini /api/generate] SUCESSO com modelo: ${modelCandidate}!`);
-            break;
-          } catch (err: any) {
-            lastGeminiError = err;
-            const errMsg = err?.message || String(err);
-            const is503 = errMsg.includes("503") || errMsg.includes("high demand") || err?.status === 503;
-            console.warn(`[Gemini /api/generate] Falha com modelo ${modelCandidate} (tentativa ${attempt}):`, errMsg);
-
-            if (is503 && attempt < 2) {
-              console.log(`[Gemini /api/generate] 503 detectado em ${modelCandidate}. Aguardando 1.5s para tentar novamente...`);
-              await new Promise((r) => setTimeout(r, 1500));
-              continue;
-            }
-            break;
-          }
-        }
-        if (response) break;
-      }
-
-      if (!response) {
-        throw lastGeminiError || new Error("Nenhum modelo Gemini disponível respondeu com sucesso.");
-      }
-
-      const responseText = response.text || "[]";
       let parsedPitches: FallbackPitch[] = [];
-
       try {
-        parsedPitches = JSON.parse(responseText);
+        const cleanJson = responseTextRaw.replace(/```json\s*/gi, "").replace(/```\s*$/g, "").trim();
+        parsedPitches = JSON.parse(cleanJson);
       } catch (parseErr) {
-        console.error("Falha ao parsear JSON retornado pelo Gemini:", parseErr);
+        console.error("Falha ao parsear JSON retornado pelo Gemini Interactions:", parseErr, "Raw:", responseTextRaw);
         parsedPitches = generateOfflinePitches(persona, updateFound, channel, weeklyTheme, pitchCount, initialIdea);
       }
 

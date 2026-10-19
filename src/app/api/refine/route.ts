@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { RefinePitchRequestSchema } from "@/lib/schemas";
-import { GoogleGenAI } from "@google/genai";
+import { callGoogleGeminiInteractions } from "@/lib/gemini";
 import fs from "fs";
 import path from "path";
 
@@ -170,8 +170,6 @@ export async function POST(req: NextRequest) {
 
     if (geminiApiKey) {
       try {
-        const ai = new GoogleGenAI({ apiKey: geminiApiKey });
-
         const prompt = `Você é o Diretor Criativo e Copywriter Sênior do Festival Iguassu Inova 2026 (Itaipu Parquetec, Foz do Iguaçu).
 O conteudista pediu um ajuste/reescrita em uma pauta específica.
 
@@ -183,16 +181,17 @@ PAUTA ATUAL (QUE PRECISA SER CORRIGIDA/MELHORADA):
 - Legenda Atual: ${currentPitch.legenda}
 - Formato Atual: ${currentPitch.formato}
 
-PEDIDO DE ALTERAÇÃO DO CONTEUDISTA (PRIORIDADE MÁXIMA):
+PEDIDO DE ALTERAÇÃO DO CONTEUDISTA (PRIORIDADE MÁXIMA E ABSOLUTA):
 - O que mudar / Crítica do conteudista: "${instruction || "Reescreva de forma mais criativa, natural e impactante"}"
 - Formato desejado: "${targetFormatLabel}"
 - Tom de voz desejado: "${targetTone}"
 
 REGRAS OBRIGATÓRIAS:
-1. Atenda EXATAMENTE à crítica ou pedido do conteudista acima. Se ele reclamou que a headline estava estranha ou cortada, crie uma Headline 100% nova, limpa, publicitária, natural e criativa (sem reticências truncadas e sem colocar prefixos como [v2]).
-2. Reescreva o Mote de forma limpa, sem apenas adicionar parênteses no texto antigo.
-3. Adapte a Legenda para o formato "${targetFormatLabel}" (ex: se for Reels, inclua sugestão rápida de cenas + legenda completa).
-4. Mantenha os dados reais da persona na justificativa.
+1. ATENDA COM PRECISÃO TOTAL ao que o conteudista pediu acima! Se ele especificou atrações, palestrantes (ex: Dr. Drauzio Varella), temas (medicina, saúde, IA) ou públicos específicos (alunos do Paraguai e Brasil), o conteúdo DEVE ser 100% sobre esse tema!
+2. Headline (O que vai na arte): Crie uma frase de capa publicitária limpa, impactante e criativa (sem reticências truncadas e sem prefixos como [v2]).
+3. Reescreva o Mote explicando a conexão da atração com a persona e com o que o conteudista pediu.
+4. Adapte a Legenda para o formato "${targetFormatLabel}" (se for Reels, inclua o roteiro de cenas + copy completa para a legenda com emojis, informações de passaporte gratuito na Yazo Tickets e CTA).
+5. Justificativa com Dados: Justifique citando como isso engaja a persona.
 
 RETORNE EXCLUSIVAMENTE UM OBJETO JSON VÁLIDO:
 {
@@ -203,62 +202,22 @@ RETORNE EXCLUSIVAMENTE UM OBJETO JSON VÁLIDO:
   "justificativaFormato": "..."
 }`;
 
-        const CANDIDATE_MODELS = [
-          "gemini-3.8-flash",
-          "gemini-4-argon",
-          "gemini-3.8-pro",
-          "gemini-2.0-flash-exp"
-        ];
-        let response: any = null;
-        let lastGeminiErr: any = null;
+        const { text: responseTextRaw, model: modelUsed } = await callGoogleGeminiInteractions(geminiApiKey, prompt);
+        engineUsed = `gemini_${modelUsed}`;
 
-        for (const candidate of CANDIDATE_MODELS) {
-          for (let attempt = 1; attempt <= 2; attempt++) {
-            try {
-              console.log(`[Gemini Refine] Tentando modelo: ${candidate} (tentativa ${attempt})...`);
-              response = await ai.models.generateContent({
-                model: candidate,
-                contents: prompt,
-                config: {
-                  responseMimeType: "application/json"
-                }
-              });
-              console.log(`[Gemini Refine] SUCESSO com modelo: ${candidate}!`);
-              engineUsed = `gemini_${candidate}`;
-              break;
-            } catch (modelErr: any) {
-              lastGeminiErr = modelErr;
-              const errMsg = modelErr?.message || String(modelErr);
-              const is503 = errMsg.includes("503") || errMsg.includes("high demand") || modelErr?.status === 503;
-              console.warn(`[Gemini Refine] Falha com modelo ${candidate} (tentativa ${attempt}):`, errMsg);
-
-              if (is503 && attempt < 2) {
-                console.log(`[Gemini Refine] 503 detectado em ${candidate}. Aguardando 1.5s para retry...`);
-                await new Promise((r) => setTimeout(r, 1500));
-                continue;
-              }
-              break;
-            }
-          }
-          if (response) break;
-        }
-
-        if (response) {
-          const parsed = JSON.parse(response.text || "{}");
-          if (parsed.headlineArte && parsed.legenda) {
-            rewritten = {
-              mote: parsed.mote || currentPitch.mote,
-              headlineArte: parsed.headlineArte,
-              legenda: parsed.legenda,
-              formato: parsed.formato || targetFormatLabel,
-              justificativaFormato: parsed.justificativaFormato || currentPitch.justificativaFormato
-            };
-          }
-        } else {
-          console.error("Todos os modelos Gemini falharam no refine:", lastGeminiErr);
+        const cleanJson = responseTextRaw.replace(/```json\s*/gi, "").replace(/```\s*$/g, "").trim();
+        const parsed = JSON.parse(cleanJson);
+        if (parsed.headlineArte && parsed.legenda) {
+          rewritten = {
+            mote: parsed.mote || currentPitch.mote,
+            headlineArte: parsed.headlineArte,
+            legenda: parsed.legenda,
+            formato: parsed.formato || targetFormatLabel,
+            justificativaFormato: parsed.justificativaFormato || currentPitch.justificativaFormato
+          };
         }
       } catch (geminiError) {
-        console.error("Erro no Gemini ao refinar pauta, acionando reescrita inteligente local:", geminiError);
+        console.error("Erro no Gemini Interactions ao refinar pauta, acionando reescrita inteligente local:", geminiError);
       }
     }
 
