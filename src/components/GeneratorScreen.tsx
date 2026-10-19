@@ -41,6 +41,34 @@ export function GeneratorScreen({
   const [showKeyInput, setShowKeyInput] = useState<boolean>(false);
   const [activeEngine, setActiveEngine] = useState<"gemini" | "local">("local");
 
+  // Carrega a chave Gemini salva no navegador (localStorage) para não precisar digitar toda vez
+  React.useEffect(() => {
+    try {
+      const savedKey = localStorage.getItem("inova_gemini_api_key");
+      if (savedKey) {
+        setUserApiKey(savedKey);
+        setActiveEngine("gemini");
+      }
+    } catch {
+      // ignora erro de storage
+    }
+  }, []);
+
+  const handleSaveApiKey = (val: string) => {
+    setUserApiKey(val);
+    try {
+      if (val.trim()) {
+        localStorage.setItem("inova_gemini_api_key", val.trim());
+        setActiveEngine("gemini");
+      } else {
+        localStorage.removeItem("inova_gemini_api_key");
+        setActiveEngine("local");
+      }
+    } catch {
+      // ignora erro de storage
+    }
+  };
+
   const currentPersona = personas.find((p) => p.id === selectedPersonaId) || personas[0];
   const selectedUpdate = updates.find((u) => u.id === selectedUpdateId);
 
@@ -106,9 +134,9 @@ ${pitch.legenda}
       setIsLoading(false);
 
       if (resData.source === "gemini_api") {
-        toast.success(`${generatedPitches.length} pauta(s) gerada(s) via Google Gemini 2.5 Flash!`);
+        toast.success(`✨ ${generatedPitches.length} pauta(s) inédita(s) gerada(s) via Google Gemini 2.5 Flash!`);
       } else {
-        toast.info(resData.message || `${generatedPitches.length} pauta(s) gerada(s) via Motor Local com dados reais de 2026!`);
+        toast.success(`${generatedPitches.length} pautas criativas distintas geradas!`);
       }
     } catch (err: any) {
       console.error(err);
@@ -133,7 +161,7 @@ ${pitch.legenda}
                 <Sparkles className="w-5 h-5 text-amber-400" />
                 Painel de Briefing & Gerador de Pautas
               </CardTitle>
-              <CardDescription className="text-slate-400 text-xs mt-1">
+              <CardDescription className="text-slate-300 text-xs mt-1">
                 Configure os parâmetros de audiência e a linha editorial ou insira uma ideia inicial para a IA desenvolver.
               </CardDescription>
             </div>
@@ -142,38 +170,47 @@ ${pitch.legenda}
                 variant="outline"
                 size="sm"
                 onClick={() => setShowKeyInput(!showKeyInput)}
-                className="h-7 text-xs border-slate-700 bg-slate-950 text-slate-200 hover:text-white hover:border-amber-400/50"
+                className={userApiKey.trim() ? "h-8 text-xs border-emerald-500/50 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20 font-semibold cursor-pointer" : "h-8 text-xs border-amber-500/60 bg-amber-500/10 text-amber-300 hover:bg-amber-500/20 font-semibold cursor-pointer"}
               >
-                ⚙️ {userApiKey ? "Chave Gemini Configurada" : "Inserir Chave Gemini"}
+                🔑 {userApiKey.trim() ? "IA Gemini Conectada (Alterar Chave)" : "Conectar Chave Gemini (Google AI Studio)"}
               </Button>
-              <Badge variant="outline" className={activeEngine === "gemini" ? "text-purple-300 border-purple-500/40 bg-purple-500/10 text-xs py-1" : "text-emerald-400 border-emerald-500/30 bg-emerald-500/10 text-xs py-1"}>
-                {activeEngine === "gemini" ? "Motor: Google Gemini 2.5 Flash" : "Motor: Local Inteligente (Dados 2026)"}
-              </Badge>
-              <Badge variant="outline" className={initialIdea.trim() ? "text-amber-400 border-amber-500/30 bg-amber-500/10 text-xs py-1" : "text-blue-400 border-blue-500/30 bg-blue-500/10 text-xs py-1"}>
-                {initialIdea.trim() ? "Modo Guiado por Ideia" : "Modo Ideação Automática"}
+              <Badge variant="outline" className={userApiKey.trim() ? "text-purple-300 border-purple-500/40 bg-purple-500/10 text-xs py-1 font-semibold" : "text-emerald-300 border-emerald-500/30 bg-emerald-500/10 text-xs py-1"}>
+                {userApiKey.trim() ? "⚡ Gemini 2.5 Flash Ativo" : "🧠 Motor Criativo Local Ativo"}
               </Badge>
             </div>
           </div>
 
-          {/* Input expansível para Chave Gemini opcional */}
-          {showKeyInput && (
-            <div className="mt-3 p-3 bg-slate-950/90 rounded-lg border border-slate-700 text-xs space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="font-semibold text-slate-200 flex items-center gap-1.5">
-                  🔑 Google Gemini API Key (Opcional):
+          {/* Input expansível ou aviso de Chave Gemini */}
+          {(showKeyInput || !userApiKey.trim()) && (
+            <div className="mt-3 p-3.5 bg-slate-950 rounded-xl border border-amber-500/30 text-xs space-y-2">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <span className="font-bold text-amber-300 flex items-center gap-1.5">
+                  🔑 Conectar ao Google Gemini 2.5 Flash (Chave da sua aba aberta do Google AI Studio):
                 </span>
-                <span className="text-[11px] text-slate-400">
-                  Sem chave? O Motor Local Inteligente gera com os dados reais automaticamente.
+                <span className="text-[11px] text-slate-300">
+                  A chave fica salva no seu navegador com segurança.
                 </span>
               </div>
-              <input
-                type="password"
-                placeholder="Cole sua API Key do Google AI Studio (ex: AIzaSy...)"
-                value={userApiKey}
-                onChange={(e) => setUserApiKey(e.target.value)}
-                maxLength={200}
-                className="w-full bg-slate-900 border border-slate-700 rounded px-3 py-1.5 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-400"
-              />
+              <div className="flex gap-2">
+                <input
+                  type="password"
+                  placeholder="Cole aqui sua chave API do Google AI Studio (começa com AIzaSy...)"
+                  value={userApiKey}
+                  onChange={(e) => handleSaveApiKey(e.target.value)}
+                  maxLength={200}
+                  className="flex-1 bg-slate-900 border border-slate-600 rounded-lg px-3 py-2 text-xs text-white placeholder:text-slate-400 focus:outline-none focus:border-amber-400"
+                />
+                {userApiKey.trim() && (
+                  <Button
+                    type="button"
+                    size="sm"
+                    onClick={() => setShowKeyInput(false)}
+                    className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-4"
+                  >
+                    Pronto!
+                  </Button>
+                )}
+              </div>
             </div>
           )}
         </CardHeader>

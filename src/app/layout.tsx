@@ -21,9 +21,15 @@ export default function RootLayout({
   return (
     <html
       lang="pt-BR"
+      suppressHydrationWarning
       className={`${inter.variable} font-sans h-full antialiased dark`}
     >
-      <body className="min-h-full flex flex-col font-sans bg-slate-950 text-slate-100">{children}</body>
+      <body
+        suppressHydrationWarning
+        className="min-h-full flex flex-col font-sans bg-slate-950 text-slate-100"
+      >
+        {children}
+      </body>
     </html>
   );
 }
