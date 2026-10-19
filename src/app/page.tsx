@@ -18,19 +18,43 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState<string>("generator");
   const [userApiKey, setUserApiKey] = useState<string>("");
 
-  // Carrega chave salva e pautas persistidas no banco local ao abrir o aplicativo
+  // Carrega chave salva e pautas persistidas no banco local e navegador ao abrir o aplicativo
   React.useEffect(() => {
+    let localSaved: PitchContent[] = [];
     if (typeof window !== "undefined") {
       const savedKey = localStorage.getItem("inova_gemini_api_key") || localStorage.getItem("inova_pauta_gemini_key") || "";
       if (savedKey) setUserApiKey(savedKey);
+
+      try {
+        const rawLocalPitches = localStorage.getItem("inova_saved_pitches");
+        if (rawLocalPitches) {
+          localSaved = JSON.parse(rawLocalPitches);
+          if (Array.isArray(localSaved) && localSaved.length > 0) {
+            setPitches(localSaved);
+          }
+        }
+      } catch {
+        // safe ignore
+      }
     }
 
     async function loadPitches() {
       try {
         const res = await fetch("/api/pitches");
         const data = await res.json();
-        if (data.success && data.pitches && data.pitches.length > 0) {
-          setPitches(data.pitches);
+        if (data.success && Array.isArray(data.pitches)) {
+          // Mescla sem duplicar por ID
+          setPitches((prev) => {
+            const ids = new Set(prev.map((p) => p.id));
+            const merged = [...prev];
+            for (const p of data.pitches) {
+              if (!ids.has(p.id)) {
+                ids.add(p.id);
+                merged.push(p);
+              }
+            }
+            return merged;
+          });
         }
       } catch (err) {
         console.error("Falha ao carregar pautas salvas:", err);
@@ -39,22 +63,44 @@ export default function Home() {
     loadPitches();
   }, []);
 
+  // Salva no localStorage do navegador sempre que as pautas forem alteradas
+  const syncLocalStorage = (updatedList: PitchContent[]) => {
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.setItem("inova_saved_pitches", JSON.stringify(updatedList));
+      } catch {
+        // safe ignore
+      }
+    }
+  };
+
   const handleNewPitchesGenerated = (newPitches: PitchContent[]) => {
     // Adiciona as novas pautas no topo da lista (histórico automático)
-    setPitches((prev) => [...newPitches, ...prev]);
+    setPitches((prev) => {
+      const updated = [...newPitches, ...prev];
+      syncLocalStorage(updated);
+      return updated;
+    });
   };
 
   const handleUpdatePitch = (pitchId: string, updatedFields: Partial<PitchContent>) => {
-    setPitches((prev) =>
-      prev.map((p) => (p.id === pitchId ? { ...p, ...updatedFields } : p))
-    );
+    setPitches((prev) => {
+      const updated = prev.map((p) => (p.id === pitchId ? { ...p, ...updatedFields } : p));
+      syncLocalStorage(updated);
+      return updated;
+    });
   };
 
   const handleDeletePitch = (pitchId: string) => {
     if (pitchId === "all") {
       setPitches([]);
+      syncLocalStorage([]);
     } else {
-      setPitches((prev) => prev.filter((p) => p.id !== pitchId));
+      setPitches((prev) => {
+        const updated = prev.filter((p) => p.id !== pitchId);
+        syncLocalStorage(updated);
+        return updated;
+      });
     }
   };
 

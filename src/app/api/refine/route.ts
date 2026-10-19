@@ -16,7 +16,11 @@ function getSavedPitches(): any[] {
 }
 
 function savePitches(pitches: any[]): void {
-  fs.writeFileSync(PITCHES_PATH, JSON.stringify(pitches, null, 2), "utf-8");
+  try {
+    fs.writeFileSync(PITCHES_PATH, JSON.stringify(pitches, null, 2), "utf-8");
+  } catch (err) {
+    console.warn("[Storage] Ambiente serverless/read-only (Vercel): gravação em arquivo local ignorada com segurança.");
+  }
 }
 
 const FORMAT_LABELS: Record<string, string> = {
