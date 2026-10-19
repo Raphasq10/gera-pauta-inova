@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Sparkles, Copy, Check, RefreshCw, Lightbulb, Users, ArrowRight, Layers, FileText, Send } from "lucide-react";
+import { Sparkles, Copy, Check, RefreshCw, Lightbulb, Users, ArrowRight, Layers, FileText, Send, Trash2 } from "lucide-react";
 import { PersonaData, FestivalUpdate, PitchContent } from "@/data/mockData";
 import { RefinePitchModal } from "@/components/RefinePitchModal";
 import { toast } from "sonner";
@@ -18,6 +18,7 @@ interface GeneratorScreenProps {
   pitches: PitchContent[];
   onNewPitchesGenerated: (newPitches: PitchContent[]) => void;
   onUpdatePitch: (pitchId: string, updatedPitch: Partial<PitchContent>) => void;
+  onDeletePitch?: (pitchId: string) => void;
 }
 
 export function GeneratorScreen({
@@ -25,7 +26,8 @@ export function GeneratorScreen({
   updates,
   pitches,
   onNewPitchesGenerated,
-  onUpdatePitch
+  onUpdatePitch,
+  onDeletePitch
 }: GeneratorScreenProps) {
   const [selectedPersonaId, setSelectedPersonaId] = useState<string>(personas[0]?.id || "p2");
   const [selectedUpdateId, setSelectedUpdateId] = useState<string>("none");
@@ -148,6 +150,24 @@ ${pitch.legenda}
   const handleApplyRefine = (pitchId: string, updatedPitch: Partial<PitchContent>) => {
     onUpdatePitch(pitchId, updatedPitch);
     toast.success(`Pauta atualizada para a versão v${updatedPitch.version}!`);
+  };
+
+  const handleDelete = async (pitchId: string, headline: string) => {
+    if (!confirm(`Deseja realmente apagar a pauta "${headline.slice(0, 45)}..." do banco de dados?`)) return;
+
+    try {
+      const res = await fetch(`/api/pitches?id=${encodeURIComponent(pitchId)}`, {
+        method: "DELETE"
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || "Erro ao excluir pauta.");
+      }
+      if (onDeletePitch) onDeletePitch(pitchId);
+      toast.success("Pauta apagada do banco de dados com sucesso!");
+    } catch (err: any) {
+      toast.error(err.message || "Falha ao apagar pauta.");
+    }
   };
 
   return (
@@ -497,23 +517,36 @@ ${pitch.legenda}
                 </CardContent>
 
                 <CardFooter className="pt-3 pb-4 border-t border-slate-800 flex items-center justify-between gap-2">
-                  {/* BOTÃO PARA REFAZER / AJUSTAR PAUTA ESPECÍFICA */}
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setActivePitchForRefine(pitch)}
-                    className="border-slate-600 hover:bg-slate-800 text-slate-100 font-semibold text-xs gap-1.5"
-                  >
-                    <RefreshCw className="w-3.5 h-3.5 text-amber-400" />
-                    Refazer / Ajustar
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    {/* BOTÃO PARA REFAZER / AJUSTAR PAUTA ESPECÍFICA */}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setActivePitchForRefine(pitch)}
+                      className="border-slate-600 hover:bg-slate-800 text-slate-100 font-semibold text-xs gap-1.5 cursor-pointer"
+                    >
+                      <RefreshCw className="w-3.5 h-3.5 text-amber-400" />
+                      Refazer / Ajustar
+                    </Button>
+
+                    {/* BOTÃO DE APAGAR PAUTA */}
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleDelete(pitch.id, pitch.headlineArte)}
+                      title="Apagar esta pauta do banco de dados"
+                      className="text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 text-xs px-2.5 cursor-pointer"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </Button>
+                  </div>
 
                   {/* BOTÃO DE COPIAR CONTEÚDO */}
                   <Button
                     variant="default"
                     size="sm"
                     onClick={() => handleCopy(pitch)}
-                    className="bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs gap-1.5 border border-slate-700"
+                    className="bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs gap-1.5 border border-slate-700 cursor-pointer"
                   >
                     {copiedId === pitch.id ? (
                       <>

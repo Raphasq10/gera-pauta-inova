@@ -44,6 +44,14 @@ export default function Home() {
     );
   };
 
+  const handleDeletePitch = (pitchId: string) => {
+    if (pitchId === "all") {
+      setPitches([]);
+    } else {
+      setPitches((prev) => prev.filter((p) => p.id !== pitchId));
+    }
+  };
+
   const handleAddUpdate = (newUpdate: FestivalUpdate) => {
     setUpdates((prev) => [newUpdate, ...prev]);
   };
@@ -146,6 +154,7 @@ export default function Home() {
               pitches={pitches}
               onNewPitchesGenerated={handleNewPitchesGenerated}
               onUpdatePitch={handleUpdatePitch}
+              onDeletePitch={handleDeletePitch}
             />
           </TabsContent>
 
@@ -155,6 +164,7 @@ export default function Home() {
               pitches={pitches}
               personas={personas}
               onUpdatePitch={handleUpdatePitch}
+              onDeletePitch={handleDeletePitch}
             />
           </TabsContent>
 

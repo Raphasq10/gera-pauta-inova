@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { History, Search, RefreshCw, Copy, Check, Filter, Sparkles, Clock, ArrowUpDown } from "lucide-react";
+import { History, Search, RefreshCw, Copy, Check, Filter, Sparkles, Clock, ArrowUpDown, Trash2 } from "lucide-react";
 import { PitchContent, PersonaData } from "@/data/mockData";
 import { RefinePitchModal } from "@/components/RefinePitchModal";
 import { toast } from "sonner";
@@ -15,9 +15,10 @@ interface HistoryScreenProps {
   pitches: PitchContent[];
   personas: PersonaData[];
   onUpdatePitch: (pitchId: string, updatedPitch: Partial<PitchContent>) => void;
+  onDeletePitch?: (pitchId: string) => void;
 }
 
-export function HistoryScreen({ pitches, personas, onUpdatePitch }: HistoryScreenProps) {
+export function HistoryScreen({ pitches, personas, onUpdatePitch, onDeletePitch }: HistoryScreenProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterPersona, setFilterPersona] = useState<string>("all");
   const [activePitchForRefine, setActivePitchForRefine] = useState<PitchContent | null>(null);
@@ -55,6 +56,42 @@ ${pitch.legenda}
     toast.success(`Pauta atualizada no histórico para a versão v${updatedPitch.version}!`);
   };
 
+  const handleDelete = async (pitchId: string, headline: string) => {
+    if (!confirm(`Deseja realmente apagar a pauta "${headline.slice(0, 45)}..." do banco de dados?`)) return;
+
+    try {
+      const res = await fetch(`/api/pitches?id=${encodeURIComponent(pitchId)}`, {
+        method: "DELETE"
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || "Erro ao excluir pauta.");
+      }
+      if (onDeletePitch) onDeletePitch(pitchId);
+      toast.success("Pauta apagada do banco de dados local!");
+    } catch (err: any) {
+      toast.error(err.message || "Falha ao apagar pauta.");
+    }
+  };
+
+  const handleClearAll = async () => {
+    if (!confirm("Atenção: Deseja realmente apagar TODAS as pautas salvas no histórico local?")) return;
+
+    try {
+      const res = await fetch(`/api/pitches?id=all`, {
+        method: "DELETE"
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || "Erro ao limpar histórico.");
+      }
+      if (onDeletePitch) onDeletePitch("all");
+      toast.success("Histórico limpo com sucesso!");
+    } catch (err: any) {
+      toast.error(err.message || "Falha ao limpar histórico.");
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* CABEÇALHO & FILTROS DO HISTÓRICO */}
@@ -64,15 +101,15 @@ ${pitch.legenda}
             <History className="w-5 h-5 text-amber-400" />
             Histórico Automático de Pautas Criadas
           </h2>
-          <p className="text-slate-400 text-xs mt-1">
-            Todas as pautas geradas são preservadas aqui. Você pode reabrir qualquer pauta para refazer ou ajustar com a IA.
+          <p className="text-slate-300 text-xs mt-1">
+            Salvas automaticamente em <code className="text-amber-300 bg-slate-950 px-1.5 py-0.5 rounded">src/data/saved-pitches.json</code> no seu computador.
           </p>
         </div>
 
         {/* Barra de Busca e Filtro */}
         <div className="flex flex-wrap items-center gap-3">
           <div className="relative w-full sm:w-64">
-            <Search className="w-3.5 h-3.5 absolute left-3 top-3 text-slate-500" />
+            <Search className="w-3.5 h-3.5 absolute left-3 top-3 text-slate-400" />
             <Input
               placeholder="Buscar por termo ou headline..."
               value={searchTerm}
@@ -95,6 +132,18 @@ ${pitch.legenda}
               ))}
             </SelectContent>
           </Select>
+
+          {pitches.length > 0 && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleClearAll}
+              className="h-9 border-rose-500/30 bg-rose-500/10 text-rose-300 hover:bg-rose-500/20 text-xs gap-1.5 cursor-pointer"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+              Limpar Tudo
+            </Button>
+          )}
         </div>
       </div>
 
@@ -121,12 +170,12 @@ ${pitch.legenda}
                     <Badge variant="outline" className="border-amber-500/30 text-amber-300 bg-amber-500/10 text-[11px] font-mono">
                       v{pitch.version}
                     </Badge>
-                    <span className="text-[11px] text-slate-400 flex items-center gap-1 font-mono">
+                    <span className="text-[11px] text-slate-300 flex items-center gap-1 font-mono">
                       <Clock className="w-3 h-3" />
                       {pitch.createdAt}
                     </span>
                   </div>
-                  <Badge variant="secondary" className="bg-slate-800 text-slate-300 text-[11px]">
+                  <Badge variant="secondary" className="bg-slate-800 text-slate-200 text-[11px]">
                     {pitch.personaName.split("(")[0]}
                   </Badge>
                 </div>
@@ -134,29 +183,29 @@ ${pitch.legenda}
 
               <CardContent className="space-y-3.5 pt-4 text-xs">
                 {pitch.initialIdea && (
-                  <div className="bg-slate-950/60 p-2 rounded border border-slate-800 text-[11px] text-slate-400">
+                  <div className="bg-slate-950/60 p-2.5 rounded border border-slate-800 text-xs text-slate-300">
                     <span className="text-amber-400 font-semibold">💡 Ideia Inicial:</span> &ldquo;{pitch.initialIdea}&rdquo;
                   </div>
                 )}
 
                 <div>
-                  <span className="text-[10px] font-bold uppercase text-amber-400 block">🎯 Mote:</span>
-                  <p className="text-slate-200 text-sm font-medium mt-0.5">{pitch.mote}</p>
+                  <span className="text-[11px] font-bold uppercase text-amber-400 block">🎯 Mote:</span>
+                  <p className="text-white text-sm font-medium mt-0.5">{pitch.mote}</p>
                 </div>
 
-                <div className="bg-slate-950 p-2.5 rounded border border-slate-800">
-                  <span className="text-[10px] font-bold uppercase text-slate-400 block mb-0.5">🖼️ Headline:</span>
-                  <p className="text-amber-200 text-sm font-bold">&ldquo;{pitch.headlineArte}&rdquo;</p>
+                <div className="bg-slate-950 p-3 rounded border border-slate-700">
+                  <span className="text-[11px] font-bold uppercase text-slate-300 block mb-0.5">🖼️ Headline:</span>
+                  <p className="text-amber-300 text-sm font-bold">&ldquo;{pitch.headlineArte}&rdquo;</p>
                 </div>
 
-                <div className="bg-slate-950/40 p-2.5 rounded border border-slate-800/60 text-[11px]">
-                  <span className="text-slate-400 font-semibold">📐 Formato: </span>
-                  <span className="text-emerald-300">{pitch.formato}</span>
-                  <p className="text-slate-400 mt-1 line-clamp-2">{pitch.justificativaFormato}</p>
+                <div className="bg-slate-950/60 p-2.5 rounded border border-slate-800 text-xs">
+                  <span className="text-slate-300 font-semibold">📐 Formato: </span>
+                  <span className="text-emerald-300 font-semibold">{pitch.formato}</span>
+                  <p className="text-slate-300 mt-1 line-clamp-2">{pitch.justificativaFormato}</p>
                 </div>
 
                 {pitch.previousVersions && pitch.previousVersions.length > 0 && (
-                  <div className="text-[11px] text-slate-400 border-t border-slate-800/60 pt-2 flex items-center justify-between">
+                  <div className="text-xs text-slate-300 border-t border-slate-800/60 pt-2 flex items-center justify-between">
                     <span>Versões anteriores salvas:</span>
                     <span className="text-amber-400 font-semibold">{pitch.previousVersions.length} versão(ões)</span>
                   </div>
@@ -164,21 +213,33 @@ ${pitch.legenda}
               </CardContent>
 
               <CardFooter className="pt-3 pb-3 border-t border-slate-800 flex items-center justify-between">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setActivePitchForRefine(pitch)}
-                  className="border-slate-700 hover:bg-slate-800 text-slate-200 text-xs gap-1.5"
-                >
-                  <RefreshCw className="w-3.5 h-3.5 text-amber-400" />
-                  Refazer / Ajustar
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setActivePitchForRefine(pitch)}
+                    className="border-slate-600 hover:bg-slate-800 text-slate-100 text-xs gap-1.5 cursor-pointer"
+                  >
+                    <RefreshCw className="w-3.5 h-3.5 text-amber-400" />
+                    Refazer / Ajustar
+                  </Button>
+
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleDelete(pitch.id, pitch.headlineArte)}
+                    title="Apagar esta pauta do banco de dados"
+                    className="text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 text-xs px-2.5 cursor-pointer"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </Button>
+                </div>
 
                 <Button
                   variant="default"
                   size="sm"
                   onClick={() => handleCopy(pitch)}
-                  className="bg-slate-800 hover:bg-slate-700 text-white text-xs gap-1.5"
+                  className="bg-slate-800 hover:bg-slate-700 text-white text-xs gap-1.5 border border-slate-700 cursor-pointer"
                 >
                   {copiedId === pitch.id ? (
                     <>

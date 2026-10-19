@@ -134,3 +134,52 @@ export async function PUT(req: NextRequest) {
     );
   }
 }
+
+// DELETE /api/pitches?id=... -> Apaga uma pauta específica (ou todas se id=all) do banco de dados local
+export async function DELETE(req: NextRequest) {
+  try {
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get("id")?.trim();
+
+    if (!id) {
+      return NextResponse.json(
+        { success: false, error: "ID da pauta não informado para exclusão." },
+        { status: 400 }
+      );
+    }
+
+    const currentPitches = getSavedPitches();
+
+    if (id === "all") {
+      savePitches([]);
+      return NextResponse.json({
+        success: true,
+        message: "Todas as pautas foram removidas do histórico local."
+      });
+    }
+
+    const exists = currentPitches.some((p) => p.id === id);
+    if (!exists) {
+      return NextResponse.json(
+        { success: false, error: "Pauta não encontrada no banco de dados." },
+        { status: 404 }
+      );
+    }
+
+    const updatedPitches = currentPitches.filter((p) => p.id !== id);
+    savePitches(updatedPitches);
+
+    return NextResponse.json({
+      success: true,
+      message: "Pauta excluída permanentemente do banco de dados local.",
+      pitches: updatedPitches
+    });
+  } catch (error) {
+    console.error("Erro ao excluir pauta:", error);
+    return NextResponse.json(
+      { success: false, error: "Erro interno ao excluir pauta." },
+      { status: 500 }
+    );
+  }
+}
+
