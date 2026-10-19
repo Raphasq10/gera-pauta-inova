@@ -38,7 +38,8 @@ function smartLocalRewrite(
   targetFormatKey: string,
   targetToneKey: string
 ) {
-  const instr = (instruction || "").toLowerCase();
+  const rawInstr = (instruction || "").trim();
+  const instr = rawInstr.toLowerCase();
   const nextVersion = (currentPitch.version || 1) + 1;
 
   // Traduz o formato para um nome legível
@@ -47,93 +48,66 @@ function smartLocalRewrite(
       ? FORMAT_LABELS[targetFormatKey] || targetFormatKey
       : currentPitch.formato;
 
-  // Identifica sobre o que é a pauta (amigos, carreira, shows, gratuito, ou tema geral)
-  const fullContext = `${currentPitch.initialIdea || ""} ${currentPitch.mote || ""} ${currentPitch.headlineArte || ""}`.toLowerCase();
-  const isAboutFriends = fullContext.includes("amigo") || fullContext.includes("galera") || fullContext.includes("turma") || instr.includes("amigo");
-  const isQuestionRequested = instr.includes("pergunta") || instr.includes("curios") || instr.includes("interroga") || instr.includes("dúvida");
-  const isShortRequested = instr.includes("curt") || instr.includes("diret") || instr.includes("objetiv") || instr.includes("simples");
-  const isHeadlineCritique = instr.includes("headline") || instr.includes("estranh") || instr.includes("sentido") || instr.includes("título") || instr.includes("capa") || instr.includes("melhor");
-  const isShowFocus = instr.includes("show") || instr.includes("música") || instr.includes("festa") || fullContext.includes("show");
-  const isCareerFocus = instr.includes("carreira") || instr.includes("certificado") || instr.includes("hora") || instr.includes("currículo");
+  // 1. Se o conteudista enviou uma instrução específica (ex: "divulgar a palestra do dr. drauzio para os alunos de medicina do paraguai e brasil")
+  if (rawInstr.length > 5) {
+    const isDrauzio = instr.includes("drauzio") || instr.includes("médic") || instr.includes("saúde") || instr.includes("medicina");
+    const isParaguai = instr.includes("paraguai") || instr.includes("fronteira") || instr.includes("brasil");
 
-  // Pool de Headlines reais e prontas para arte (sem "..." e sem "[v2]")
-  let newHeadline = "";
+    let specificHeadline = "";
+    if (isDrauzio && isParaguai) {
+      specificHeadline = "Futuros médicos do Brasil e Paraguai: Dr. Drauzio Varella confirmado no Festival Iguassu Inova 2026! 🩺🇵🇾🇧🇷";
+    } else if (isDrauzio) {
+      specificHeadline = "Dr. Drauzio Varella em Foz: uma aula magna de saúde e ciência no Festival Iguassu Inova 2026! 🩺✨";
+    } else if (isParaguai) {
+      specificHeadline = "Atenção estudantes da Tríplice Fronteira: o maior festival de inovação do ano é 100% gratuito! 🇵🇾🇧🇷";
+    } else {
+      const cleanTheme = rawInstr
+        .replace(/^(mas a ideia é|a ideia é|quero|gostaria de|favor|por favor|mude para|divulgar|fale sobre|foque em)\s+/i, "")
+        .trim();
+      const capTheme = cleanTheme.charAt(0).toUpperCase() + cleanTheme.slice(1);
+      specificHeadline = `${capTheme}: confira todos os detalhes no Festival Iguassu Inova 2026! 🚀`;
+    }
+
+    const specificMote = `Atendimento Direto ao Briefing (v${nextVersion}): pauta focada na instrução do conteudista ("${rawInstr}"), conectando com os estudantes e profissionais de ${currentPitch.personaName.split("(")[0].trim()}.`;
+
+    let formatIntro = "";
+    if (finalFormat.toLowerCase().includes("reels")) {
+      formatIntro = `🎬 ROTEIRO DO REELS (3 CENAS):\n• Cena 1 (0-3s): Você com caderno/jaleco olhando pra câmera com o texto na tela: "${specificHeadline}"\n• Cena 2: Cortes do local (Itaipu Parquetec), auditório e arenas de inovação em saúde e tecnologia.\n• Cena 3: Mostrando a tela do app Yazo Tickets com o passaporte gratuito emitido.\n\n📌 LEGENDA:\n`;
+    } else if (finalFormat.toLowerCase().includes("carrossel")) {
+      formatIntro = `📚 ESTRUTURA DO CARROSSEL:\n• Lâmina 1 (Capa): ${specificHeadline}\n• Lâmina 2: O que torna esse encontro imperdível para a nossa região.\n• Lâmina 3: Como a imersão agrega na sua formação acadêmica e horas complementares.\n• Lâmina 4: Serviço completo (data, local e como retirar seu passaporte grátis).\n\n📌 LEGENDA:\n`;
+    }
+
+    const specificLegenda = `${formatIntro}Uma oportunidade imperdível para quem estuda e respira conhecimento na nossa fronteira! 🌟\n\n${rawInstr}.\n\nDe 25 a 28 de novembro, o Itaipu Parquetec se transforma no epicentro da inovação, reunindo grandes referências nacionais, debates essenciais e mais de 6 Mundos Temáticos com entrada 100% gratuita.\n\n📍 Local: Itaipu Parquetec (Foz do Iguaçu - PR)\n📅 Data: 25 a 28 de Novembro de 2026\n🎟️ Passaporte: Gratuito no app Yazo Tickets (link na bio)\n🎓 Certificado oficial de participação\n\nMarque aqui seus colegas de curso e garanta seu lugar antecipado!\n\n#FestivalIguassuInova2026 #MedicinaFronteira #ItaipuParquetec #FozDoIguaçu`;
+
+    return {
+      mote: specificMote,
+      headlineArte: specificHeadline,
+      legenda: specificLegenda,
+      formato: finalFormat,
+      justificativaFormato: `Formato "${finalFormat}" adaptado diretamente para a instrução: "${rawInstr}". O gancho dialoga com a formação acadêmica e a integração regional.`
+    };
+  }
+
+  // 2. Fallback geral caso a instrução seja vazia
+  const isQuestionRequested = instr.includes("pergunta") || instr.includes("curios");
+  const isShortRequested = instr.includes("curt") || instr.includes("diret");
+  const isShowFocus = instr.includes("show") || instr.includes("música");
+
+  let fallbackHeadline = "De 25 a 28 de novembro, viva o maior festival de inovação de Foz do Iguaçu! 🚀";
   if (isQuestionRequested) {
-    const questions = [
-      "Já convocou a sua dupla de faculdade pro maior rolê de inovação da fronteira?",
-      "Sabia que você e seus amigos têm entrada 100% livre nos 4 dias do Festival Iguassu Inova?",
-      "O que você faria se pudesse curtir shows nacionais e turbinar o currículo no mesmo dia?"
-    ];
-    newHeadline = questions[nextVersion % questions.length];
+    fallbackHeadline = "Você já garantiu seu passaporte gratuito para os 4 dias do Festival Iguassu Inova?";
   } else if (isShortRequested) {
-    const shorts = [
-      "Chame a galera: 4 dias de tecnologia, shows e futuro 100% grátis em Foz.",
-      "O rolê mais inteligente do ano no Itaipu Parquetec. Só falta a sua turma!",
-      "Inovação de dia, shows nacionais à noite. Tudo gratuito no Festival 2026."
-    ];
-    newHeadline = shorts[nextVersion % shorts.length];
+    fallbackHeadline = "Tecnologia, ciência e cultura 100% grátis no Itaipu Parquetec. Só falta você!";
   } else if (isShowFocus) {
-    newHeadline = "Palco FIMS + 6 Mundos de Inovação: o ponto de encontro oficial da sua galera em novembro! 🎸✨";
-  } else if (isCareerFocus) {
-    newHeadline = "Horas complementares garantidas, networking real e resenha com os amigos no Itaipu Parquetec! 🎓🚀";
-  } else if (isAboutFriends || isHeadlineCritique) {
-    const creativeOptions = [
-      "Bora fechar o semestre em grande estilo? Junte seus amigos e venha viver o Festival Iguassu Inova! 🔥",
-      "Aquele rolê na faixa que une a turma toda: tecnologia, futuro, gastronomia e shows no Parquetec!",
-      "Spoiler do seu novembro: você e seus amigos curtindo 4 dias épicos no maior festival da Tríplice Fronteira!",
-      "Nem só de prova e TCC vive o universitário: convoque seu grupo pro Festival Iguassu Inova 2026! 🙌"
-    ];
-    newHeadline = creativeOptions[nextVersion % creativeOptions.length];
-  } else {
-    const generalOptions = [
-      "Descubra tudo o que espera por você nos 6 Mundos do Festival Iguassu Inova 2026!",
-      "De 25 a 28 de novembro, o futuro tem endereço certo no Itaipu Parquetec (Entrada Franca).",
-      "Prepare-se para a maior imersão em ciência, negócios e cultura de Foz do Iguaçu!"
-    ];
-    newHeadline = generalOptions[nextVersion % generalOptions.length];
+    fallbackHeadline = "Palco dos Shows + 6 Mundos de Inovação: o seu ponto de encontro em novembro! 🎸✨";
   }
-
-  // Reescreve o Mote de forma limpa (sem concatenar lixo)
-  let newMote = "";
-  if (isAboutFriends) {
-    newMote = `Ângulo Social & Pertencimento (Versão v${nextVersion} otimizada): posicionar o Festival Iguassu Inova como o melhor ponto de encontro para grupos de amigos universitários, unindo utilidade acadêmica (certificado e networking) com lazer gratuito (shows e gastronomia).`;
-  } else {
-    newMote = `Conceito Criativo Lapidado (v${nextVersion}): conectar diretamente os interesses de ${currentPitch.personaName.split("(")[0].trim()} às experiências práticas do Itaipu Parquetec com uma chamada de capa clara, magnética e sem ruídos.`;
-  }
-
-  // Reescreve a Legenda adaptando ao Formato (Reels, Carrossel, etc.) e ao Tom
-  let intro = "";
-  if (targetToneKey === "descontraido" || isAboutFriends) {
-    intro = `Manda esse post agora no grupo da sala porque o plano de novembro já está fechado! 📲🔥\n\nQuem disse que evento de inovação é lugar de andar sozinho de terno? No Festival Iguassu Inova 2026, a experiência foi desenhada pra você viver com os seus amigos!`;
-  } else if (targetToneKey === "provocativo") {
-    intro = `Vai mesmo esperar seus amigos postarem os stories lá dentro pra perceber o que você perdeu? 👀⚡\n\nDe 25 a 28 de novembro, Foz do Iguaçu inteira vai estar conectada no Itaipu Parquetec!`;
-  } else if (targetToneKey === "b2b") {
-    intro = `Grandes carreiras e projetos nascem quando mentes inquietas se encontram no ambiente certo. 🎯\n\nDe 25 a 28 de novembro, reúna seus colegas e parceiros de jornada no Festival Iguassu Inova 2026.`;
-  } else {
-    intro = `Cansado da mesma rotina de sempre? Que tal viver 4 dias extraordinários ao lado da sua turma no Itaipu Parquetec? ✨🙌`;
-  }
-
-  let bodyStructure = "";
-  if (targetFormatKey === "reels" || finalFormat.toLowerCase().includes("reels")) {
-    bodyStructure = `\n\n🎬 ROTEIRO RÁPIDO DO REELS:\n• Cena 1 (Gancho 0-3s): Você olhando pro grupo de amigos e mostrando na tela: "${newHeadline}"\n• Cena 2 (Desenvolvimento): Cortes dinâmicos mostrando o que tem no festival — arenas de IA e games, feira de ciências, food trucks e o palco dos shows nacionais.\n• Cena 3 (CTA): Mostrando o passaporte gratuito emitido no celular pelo app Yazo Tickets.\n\n📌 LEGENDA DO POST:\n${intro}\n\nOlha tudo o que espera pela sua galera:\n🚀 6 Mundos Temáticos (Tecnologia, Ciência, Negócios e Cultura)\n🎸 Shows Nacionais Gratuitos no fim da tarde\n🎓 Certificado oficial para validar suas horas complementares\n🚌 Linhas de transporte público e fácil acesso`;
-  } else if (targetFormatKey === "carrossel" || finalFormat.toLowerCase().includes("carrossel")) {
-    bodyStructure = `\n\n${intro}\n\nArrasta pro lado e confira o checklist pra curtir com a galera:\n👉 Tela 1: ${newHeadline}\n👉 Tela 2: Maratonar os 6 Mundos interativos e testar novidades de IA na prática.\n👉 Tela 3: Garantir aquele certificado de horas complementares que salva o semestre.\n👉 Tela 4: Fechar o dia curtindo os shows nacionais e a feira gastronômica sem pagar nada!`;
-  } else {
-    bodyStructure = `\n\n${intro}\n\nTudo o que você e seus amigos vão encontrar no Itaipu Parquetec:\n✅ Palestras e oficinas práticas com grandes nomes nacionais\n✅ Arenas interativas, startups e mostra científica\n✅ Shows gratuitos e espaço de convivência\n✅ Certificado oficial de participação`;
-  }
-
-  const cta = `\n\n🎟️ 100% GRATUITO: Os passaportes são limitados! Marque seus amigos nos comentários e clique no link da bio para garantir o ingresso no app Yazo Tickets!\n\n#FestivalIguassuInova2026 #ItaipuParquetec #UniversitáriosFoz #FozDoIguaçu`;
-
-  const newLegenda = `${bodyStructure}${cta}`;
-
-  const newJustificativa = `Formato "${finalFormat}" reescrito sob medida (v${nextVersion}): headline reformulada para comunicação direta e natural, alinhada ao público de ${currentPitch.personaName} e otimizada para compartilhamento em grupos e marcação de amigos nos comentários.`;
 
   return {
-    mote: newMote,
-    headlineArte: newHeadline,
-    legenda: newLegenda,
+    mote: `Refinamento de Tom e Formato (v${nextVersion}): ajuste para o formato "${finalFormat}" com linguagem lapidada para redes sociais.`,
+    headlineArte: fallbackHeadline,
+    legenda: `De 25 a 28 de novembro, prepare-se para viver uma experiência completa no Itaipu Parquetec!\n\n🚀 6 Mundos Temáticos com tecnologia e ciência\n🎸 Shows nacionais gratuitos e espaço gastronômico\n🎓 Certificado oficial para estudantes\n🎟️ Passaporte 100% gratuito no app Yazo Tickets\n\nGaranta seu ingresso pelo link da bio!\n\n#FestivalIguassuInova2026 #ItaipuParquetec #FozDoIguaçu`,
     formato: finalFormat,
-    justificativaFormato: newJustificativa
+    justificativaFormato: `Formato "${finalFormat}" ajustado conforme seleção de parâmetros.`
   };
 }
 
@@ -226,24 +200,42 @@ RETORNE EXCLUSIVAMENTE UM OBJETO JSON VÁLIDO:
   "justificativaFormato": "..."
 }`;
 
-        const response = await ai.models.generateContent({
-          model: "gemini-2.5-flash",
-          contents: prompt,
-          config: {
-            responseMimeType: "application/json"
-          }
-        });
+        const CANDIDATE_MODELS = ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-pro"];
+        let response: any = null;
+        let lastGeminiErr: any = null;
 
-        const parsed = JSON.parse(response.text || "{}");
-        if (parsed.headlineArte && parsed.legenda) {
-          rewritten = {
-            mote: parsed.mote || currentPitch.mote,
-            headlineArte: parsed.headlineArte,
-            legenda: parsed.legenda,
-            formato: parsed.formato || targetFormatLabel,
-            justificativaFormato: parsed.justificativaFormato || currentPitch.justificativaFormato
-          };
-          engineUsed = "gemini_refine";
+        for (const candidate of CANDIDATE_MODELS) {
+          try {
+            console.log(`[Gemini Refine] Tentando modelo: ${candidate}...`);
+            response = await ai.models.generateContent({
+              model: candidate,
+              contents: prompt,
+              config: {
+                responseMimeType: "application/json"
+              }
+            });
+            console.log(`[Gemini Refine] Sucesso com modelo: ${candidate}!`);
+            engineUsed = `gemini_${candidate}`;
+            break;
+          } catch (modelErr: any) {
+            console.warn(`[Gemini Refine] Falha com modelo ${candidate}:`, modelErr?.message || modelErr);
+            lastGeminiErr = modelErr;
+          }
+        }
+
+        if (response) {
+          const parsed = JSON.parse(response.text || "{}");
+          if (parsed.headlineArte && parsed.legenda) {
+            rewritten = {
+              mote: parsed.mote || currentPitch.mote,
+              headlineArte: parsed.headlineArte,
+              legenda: parsed.legenda,
+              formato: parsed.formato || targetFormatLabel,
+              justificativaFormato: parsed.justificativaFormato || currentPitch.justificativaFormato
+            };
+          }
+        } else {
+          console.error("Todos os modelos Gemini falharam no refine:", lastGeminiErr);
         }
       } catch (geminiError) {
         console.error("Erro no Gemini ao refinar pauta, acionando reescrita inteligente local:", geminiError);

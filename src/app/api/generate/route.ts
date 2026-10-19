@@ -316,13 +316,33 @@ RETORNE EXCLUSIVAMENTE UM ARRAY JSON VÁLIDO COM OS ${pitchCount} OBJETOS, SEM M
   }
 ]`;
 
-      const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
-        contents: promptSystem,
-        config: {
-          responseMimeType: "application/json"
+      const CANDIDATE_MODELS = ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-pro"];
+      let response: any = null;
+      let modelUsed = "";
+      let lastGeminiError: any = null;
+
+      for (const modelCandidate of CANDIDATE_MODELS) {
+        try {
+          console.log(`[Gemini /api/generate] Tentando modelo: ${modelCandidate}...`);
+          response = await ai.models.generateContent({
+            model: modelCandidate,
+            contents: promptSystem,
+            config: {
+              responseMimeType: "application/json"
+            }
+          });
+          modelUsed = modelCandidate;
+          console.log(`[Gemini /api/generate] Sucesso com modelo: ${modelCandidate}!`);
+          break;
+        } catch (err: any) {
+          console.warn(`[Gemini /api/generate] Falha com modelo ${modelCandidate}:`, err?.message || err);
+          lastGeminiError = err;
         }
-      });
+      }
+
+      if (!response) {
+        throw lastGeminiError || new Error("Nenhum modelo Gemini disponível respondeu com sucesso.");
+      }
 
       const responseText = response.text || "[]";
       let parsedPitches: FallbackPitch[] = [];
@@ -355,7 +375,8 @@ RETORNE EXCLUSIVAMENTE UM ARRAY JSON VÁLIDO COM OS ${pitchCount} OBJETOS, SEM M
       return NextResponse.json({
         success: true,
         source: "gemini_api",
-        message: `✨ ${formattedPitches.length} pautas inéditas criadas pelo Google Gemini 2.5 Flash!`,
+        model: modelUsed,
+        message: `✨ ${formattedPitches.length} pautas inéditas criadas com IA (${modelUsed})!`,
         pitches: formattedPitches
       });
     } catch (geminiError: any) {
