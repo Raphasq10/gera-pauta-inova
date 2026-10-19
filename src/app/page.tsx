@@ -17,6 +17,22 @@ export default function Home() {
   const [pitches, setPitches] = useState<PitchContent[]>(INITIAL_PITCHES);
   const [activeTab, setActiveTab] = useState<string>("generator");
 
+  // Carrega pautas persistidas no banco local ao abrir o aplicativo
+  React.useEffect(() => {
+    async function loadPitches() {
+      try {
+        const res = await fetch("/api/pitches");
+        const data = await res.json();
+        if (data.success && data.pitches && data.pitches.length > 0) {
+          setPitches(data.pitches);
+        }
+      } catch (err) {
+        console.error("Falha ao carregar pautas salvas:", err);
+      }
+    }
+    loadPitches();
+  }, []);
+
   const handleNewPitchesGenerated = (newPitches: PitchContent[]) => {
     // Adiciona as novas pautas no topo da lista (histórico automático)
     setPitches((prev) => [...newPitches, ...prev]);

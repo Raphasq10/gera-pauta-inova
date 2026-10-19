@@ -13,25 +13,83 @@ interface RefinePitchModalProps {
   pitch: PitchContent | null;
   isOpen: boolean;
   onClose: () => void;
-  onApplyRefine: (pitchId: string, instruction: string, newFormat?: string, newTone?: string) => void;
+  onApplyRefine: (pitchId: string, updatedPitch: Partial<PitchContent>) => void;
+  userApiKey?: string;
 }
 
-export function RefinePitchModal({ pitch, isOpen, onClose, onApplyRefine }: RefinePitchModalProps) {
+export function RefinePitchModal({ pitch, isOpen, onClose, onApplyRefine, userApiKey }: RefinePitchModalProps) {
   const [instruction, setInstruction] = useState("");
   const [selectedFormat, setSelectedFormat] = useState<string>("manter");
   const [selectedTone, setSelectedTone] = useState<string>("manter");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   if (!pitch) return null;
 
-  const handleRefine = () => {
+  const handleRefine = async () => {
     setIsSubmitting(true);
-    setTimeout(() => {
-      onApplyRefine(pitch.id, instruction, selectedFormat, selectedTone);
-      setIsSubmitting(false);
+    setErrorMessage(null);
+
+    try {
+      const res = await fetch("/api/refine", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          pitchId: pitch.id,
+          instruction: instruction.trim(),
+          format: selectedFormat,
+          tone: selectedTone,
+          userApiKey: userApiKey?.trim() || undefined
+        })
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || "Erro ao refinar pauta.");
+      }
+
+      onApplyRefine(pitch.id, data.pitch);
       setInstruction("");
       onClose();
-    }, 600);
+    } catch (err: any) {
+      console.error(err);
+      setErrorMessage(err.message || "Falha ao comunicar com o servidor.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleRestoreVersion = async (v: any) => {
+    if (!confirm(`Deseja restaurar o conteúdo para a versão v${v.version}?`)) return;
+
+    try {
+      const restoredFields: Partial<PitchContent> = {
+        mote: v.mote,
+        headlineArte: v.headlineArte,
+        legenda: v.legenda,
+        formato: v.formato
+      };
+
+      const res = await fetch("/api/pitches", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: pitch.id,
+          fields: restoredFields
+        })
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || "Erro ao restaurar versão.");
+      }
+
+      onApplyRefine(pitch.id, data.pitch);
+      onClose();
+    } catch (err: any) {
+      console.error(err);
+      setErrorMessage(err.message || "Erro ao restaurar versão.");
+    }
   };
 
   return (
@@ -121,19 +179,36 @@ export function RefinePitchModal({ pitch, isOpen, onClose, onApplyRefine }: Refi
 
           {/* Histórico de Versões se houver */}
           {pitch.previousVersions && pitch.previousVersions.length > 0 && (
-            <div className="bg-slate-950/40 p-2.5 rounded border border-slate-800/80 mt-2">
-              <p className="text-[11px] font-semibold text-slate-400 flex items-center gap-1.5 mb-1.5">
-                <History className="w-3.5 h-3.5 text-slate-400" />
-                Histórico desta Pauta:
+            <div className="bg-slate-950/60 p-3 rounded-lg border border-slate-800 mt-2">
+              <p className="text-[11px] font-bold text-slate-300 flex items-center gap-1.5 mb-2">
+                <History className="w-3.5 h-3.5 text-amber-400" />
+                Versões Anteriores Preservadas:
               </p>
-              <div className="space-y-1 text-[11px] text-slate-400">
+              <div className="space-y-2 text-xs">
                 {pitch.previousVersions.map((v) => (
-                  <div key={v.version} className="flex items-start gap-1.5">
-                    <span className="font-mono text-amber-400">v{v.version}:</span>
-                    <span className="truncate">{v.changeNote}</span>
+                  <div key={v.version} className="flex items-center justify-between gap-2 p-2 rounded bg-slate-900 border border-slate-800">
+                    <div className="truncate">
+                      <span className="font-mono text-amber-400 font-bold mr-1.5">v{v.version}:</span>
+                      <span className="text-slate-300 text-[11px] truncate">{v.changeNote}</span>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleRestoreVersion(v)}
+                      className="h-6 text-[10px] px-2 border-slate-700 bg-slate-950 text-amber-300 hover:text-white hover:bg-slate-800"
+                    >
+                      Restaurar
+                    </Button>
                   </div>
                 ))}
               </div>
+            </div>
+          )}
+
+          {errorMessage && (
+            <div className="p-2.5 rounded bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs">
+              {errorMessage}
             </div>
           )}
         </div>

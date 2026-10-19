@@ -103,6 +103,46 @@ export const GeneratePitchesRequestSchema = z.object({
 
 export type GeneratePitchesRequestValues = z.infer<typeof GeneratePitchesRequestSchema>;
 
+// Schema da Feature 5: Estrutura de Pauta & Versionamento no Histórico
+export const PitchVersionHistorySchema = z.object({
+  version: z.number().int().min(1),
+  mote: z.string().trim().max(1000),
+  headlineArte: z.string().trim().max(500),
+  legenda: z.string().trim().max(5000),
+  formato: z.string().trim().max(200),
+  changeNote: z.string().trim().max(1000).optional()
+});
+
+export const PitchContentSchema = z.object({
+  id: z.string().trim().min(1),
+  version: z.number().int().min(1).default(1),
+  createdAt: z.string().trim().max(100),
+  personaId: z.string().trim().min(1),
+  personaName: z.string().trim().max(200),
+  updateTitle: z.string().trim().max(200).optional(),
+  initialIdea: z.string().trim().max(800).optional(),
+  channel: z.string().trim().max(100),
+  mote: z.string().trim().min(5).max(1000),
+  headlineArte: z.string().trim().min(3).max(500),
+  legenda: z.string().trim().min(10).max(5000),
+  formato: z.string().trim().min(2).max(200),
+  justificativaFormato: z.string().trim().min(5).max(2000),
+  previousVersions: z.array(PitchVersionHistorySchema).optional()
+});
+
+export type PitchContentValues = z.infer<typeof PitchContentSchema>;
+
+// Schema da Feature 5: Requisição para Refinar / Ajustar Pauta Específica
+export const RefinePitchRequestSchema = z.object({
+  pitchId: z.string().trim().min(1, "O ID da pauta é obrigatório."),
+  instruction: z.string().trim().max(600, "A instrução não pode ultrapassar 600 caracteres.").optional().or(z.literal("")),
+  format: z.string().trim().max(100).default("manter"),
+  tone: z.string().trim().max(100).default("manter"),
+  userApiKey: z.string().trim().max(200).optional()
+});
+
+export type RefinePitchRequestValues = z.infer<typeof RefinePitchRequestSchema>;
+
 // Regras para upload de planilha .xlsx
 export const MAX_FILE_SIZE = 15 * 1024 * 1024; // 15 Megabytes
 export const ALLOWED_EXTENSIONS = [".xlsx", ".xls"];

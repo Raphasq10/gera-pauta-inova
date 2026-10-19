@@ -50,31 +50,9 @@ ${pitch.legenda}
     setTimeout(() => setCopiedId(null), 2000);
   };
 
-  const handleApplyRefine = (pitchId: string, instruction: string, newFormat?: string, newTone?: string) => {
-    const pitch = pitches.find((p) => p.id === pitchId);
-    if (!pitch) return;
-
-    const previousVersion = {
-      version: pitch.version,
-      mote: pitch.mote,
-      headlineArte: pitch.headlineArte,
-      legenda: pitch.legenda,
-      formato: pitch.formato,
-      changeNote: instruction || `Ajuste de formato para ${newFormat || "novo formato"}`
-    };
-
-    const updated: Partial<PitchContent> = {
-      version: pitch.version + 1,
-      headlineArte: instruction.toLowerCase().includes("pergunta")
-        ? `Você sabia que o Festival é 100% gratuito no Parquetec?`
-        : `[Ajustada v${pitch.version + 1}] ${pitch.headlineArte}`,
-      formato: newFormat && newFormat !== "manter" ? newFormat : pitch.formato,
-      mote: `${pitch.mote} (Lapidado com instrução: ${instruction || "ajuste de tom"})`,
-      previousVersions: [...(pitch.previousVersions || []), previousVersion]
-    };
-
-    onUpdatePitch(pitchId, updated);
-    toast.success(`Pauta atualizada no histórico para a versão v${pitch.version + 1}!`);
+  const handleApplyRefine = (pitchId: string, updatedPitch: Partial<PitchContent>) => {
+    onUpdatePitch(pitchId, updatedPitch);
+    toast.success(`Pauta atualizada no histórico para a versão v${updatedPitch.version}!`);
   };
 
   return (

@@ -1,0 +1,42 @@
+[
+  {
+    "id": "pitch-1",
+    "version": 1,
+    "createdAt": "16/10/2026 14:20",
+    "personaId": "p2",
+    "personaName": "Lucas Rocha (Universitário Alunos)",
+    "updateTitle": "Rapha do RH + Mundo Sapiens",
+    "initialIdea": "Post bem-humorado de sobrevivência ao final de semestre na UNILA",
+    "channel": "instagram",
+    "mote": "Transforme o cansaço do final de semestre em horas complementares e networking de carreira real.",
+    "headlineArte": "Sobreviveu à entrega de TCC? O seu diploma precisa ver isso.",
+    "legenda": "Quem nunca perdeu o sono calculando as horas complementares que atire a primeira pedra! 🎓 No Mundo Sapiens do Festival Iguassu Inova 2026, além de garantir o certificado oficial do Itaipu Parquetec, você vai trocar ideia ao vivo com referências como Rapha do RH sobre o futuro das profissões e IA no mercado.\n\nE o melhor: o festival é 100% gratuito e tem linhas de transporte público direto para o portão do evento.\n\nGaranta seu ingresso digital gratuito no link da bio pela Yazo Tickets!\n\n#FestivalIguassuInova #MundoSapiens #UniversitariosFoz #ItaipuParquetec",
+    "formato": "Carrossel de 4 Telas (Meme inicial + Dicas Práticas)",
+    "justificativaFormato": "Escolhemos Carrossel porque 76.9% dos 2.268 alunos inscritos buscam explorar tendências de carreira e 43.7% dependem de transporte público, permitindo reter atenção com humor e entregar utilidade logística."
+  },
+  {
+    "id": "pitch-2",
+    "version": 2,
+    "createdAt": "16/10/2026 15:45",
+    "personaId": "p3",
+    "personaName": "Juliana Mendes (Comunidade Foz)",
+    "updateTitle": "Duda Beat (Show Nacional Confirmado)",
+    "initialIdea": "Lembrar os moradores de Foz que o show é gratuito e tem espaço família",
+    "channel": "instagram",
+    "mote": "A melhor programação cultural gratuita do ano no quintal da comunidade de Foz.",
+    "headlineArte": "Duda Beat de graça em Foz do Iguaçu? Pode acreditar.",
+    "legenda": "Você não leu errado: um dos maiores shows do Brasil vai rolar aqui em Foz com entrada franca! 🎶 O Festival Iguassu Inova reuniu música, feira gastronômica e muita diversão para você curtir com a família ou com os amigos.\n\nNão precisa pagar nada, só emitir o passaporte gratuito pelo celular na Yazo Tickets e apresentar na entrada do Itaipu Parquetec.\n\nMarca aqui quem vai com você curtir essa noite inesquecível! 👇\n\n#FestivalIguassuInova #FIMS #DudaBeatEmFoz #CulturaFoz",
+    "formato": "Reels Curto com trecho musical e chamada em texto",
+    "justificativaFormato": "Reels atinge diretamente o topo do funil do Instagram, onde 68.1% dos moradores de Foz souberam do festival e 71.1% declararam ter atividades culturais e shows como objetivo central.",
+    "previousVersions": [
+      {
+        "version": 1,
+        "mote": "Show nacional de música brasileira acessível a todos os moradores.",
+        "headlineArte": "Venha ver o grande show da Duda Beat no Parquetec.",
+        "legenda": "O Festival traz grandes atrações. Emitam seus ingressos na Yazo.",
+        "formato": "Card Estático Simples",
+        "changeNote": "O conteudista solicitou formato Reels mais chamativo destacando 'de graça' na primeira tela."
+      }
+    ]
+  }
+]

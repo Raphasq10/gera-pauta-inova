@@ -7,6 +7,19 @@ import path from "path";
 // Caminho dos arquivos locais
 const PERSONAS_PATH = path.join(process.cwd(), "src", "data", "personas-2026.json");
 const FESTIVAL_CONTEXT_PATH = path.join(process.cwd(), "src", "data", "festival-context.json");
+const PITCHES_PATH = path.join(process.cwd(), "src", "data", "saved-pitches.json");
+
+function persistPitches(newPitches: any[]): void {
+  try {
+    let current = [];
+    if (fs.existsSync(PITCHES_PATH)) {
+      current = JSON.parse(fs.readFileSync(PITCHES_PATH, "utf-8"));
+    }
+    fs.writeFileSync(PITCHES_PATH, JSON.stringify([...newPitches, ...current], null, 2), "utf-8");
+  } catch (e) {
+    console.error("Falha ao persistir pautas no disco:", e);
+  }
+}
 
 interface FallbackPitch {
   mote: string;
@@ -159,6 +172,8 @@ export async function POST(req: NextRequest) {
         justificativaFormato: p.justificativaFormato
       }));
 
+      persistPitches(formattedPitches);
+
       return NextResponse.json({
         success: true,
         source: "offline_fallback",
@@ -242,6 +257,8 @@ RETORNE EXCLUSIVAMENTE UM ARRAY JSON COM OS ${pitchCount} OBJETOS, SEM TEXTO OU 
         justificativaFormato: p.justificativaFormato
       }));
 
+      persistPitches(formattedPitches);
+
       return NextResponse.json({
         success: true,
         source: "gemini_api",
@@ -276,6 +293,8 @@ RETORNE EXCLUSIVAMENTE UM ARRAY JSON COM OS ${pitchCount} OBJETOS, SEM TEXTO OU 
         formato: p.formato,
         justificativaFormato: p.justificativaFormato
       }));
+
+      persistPitches(formattedPitches);
 
       return NextResponse.json({
         success: true,
